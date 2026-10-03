@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proposed operations v1",
+  "type": "array",
+  "minItems": 1,
+  "items": {
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "op",
+          "value"
+        ],
+        "properties": {
+          "op": {
+            "const": "profile"
+          },
+          "value": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "op",
+          "value"
+        ],
+        "properties": {
+          "op": {
+            "const": "calendar"
+          },
+          "cycle_id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$"
+          },
+          "value": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "op",
+          "collection",
+          "value"
+        ],
+        "properties": {
+          "op": {
+            "const": "upsert"
+          },
+          "cycle_id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$"
+          },
+          "collection": {
+            "enum": [
+              "sources",
+              "evidence",
+              "objectives",
+              "actions",
+              "criterion_assessments",
+              "competency_assessments",
+              "metrics",
+              "events"
+            ]
+          },
+          "value": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      }
+    ]
+  }
+}

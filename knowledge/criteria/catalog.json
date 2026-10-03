@@ -1,0 +1,244 @@
+{
+  "version": "2025-07-29",
+  "cycle_validity": "requires_confirmation",
+  "criteria": [
+    {
+      "id": "CI-01",
+      "title": "100% das hard skills da função/senioridade atual, exceto inglês",
+      "scope": "all",
+      "types": {
+        "horizontal": "not_applicable",
+        "vertical": "exclusionary",
+        "bonus": "additional"
+      },
+      "window_months": null,
+      "source": "I05",
+      "section": "linhas 9–17",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "CI-02",
+      "title": "Pelo menos 70% das hard skills atuais, exceto inglês",
+      "scope": "all",
+      "types": {
+        "horizontal": "exclusionary",
+        "vertical": "not_applicable",
+        "bonus": "not_applicable"
+      },
+      "window_months": null,
+      "source": "I05",
+      "section": "linhas 9–17",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "CI-03",
+      "title": "Pelo menos 70% das hard skills da função/senioridade desejada, exceto inglês",
+      "scope": "all",
+      "types": {
+        "horizontal": "not_applicable",
+        "vertical": "exclusionary",
+        "bonus": "not_applicable"
+      },
+      "window_months": null,
+      "source": "I05",
+      "section": "linhas 9–17",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "CI-04",
+      "title": "100% dos treinamentos obrigatórios institucionais definidos para o ano",
+      "scope": "all",
+      "types": {
+        "horizontal": "exclusionary",
+        "vertical": "exclusionary",
+        "bonus": "exclusionary"
+      },
+      "window_months": null,
+      "source": "I05",
+      "section": "linhas 9–17",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "CI-05",
+      "title": "100% das ações previstas no PDI até o período de análise",
+      "scope": "all",
+      "types": {
+        "horizontal": "exclusionary",
+        "vertical": "exclusionary",
+        "bonus": "exclusionary"
+      },
+      "window_months": null,
+      "source": "I05",
+      "section": "linhas 9–17",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "CI-06",
+      "title": "Participação ativa em iniciativa interna",
+      "scope": "all",
+      "types": {
+        "horizontal": "additional",
+        "vertical": "additional",
+        "bonus": "additional"
+      },
+      "window_months": null,
+      "source": "I05",
+      "section": "linhas 9–17",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "CI-07",
+      "title": "Treinamento interno de um turno para disseminar conhecimento nos últimos seis meses",
+      "scope": "all",
+      "types": {
+        "horizontal": "additional",
+        "vertical": "additional",
+        "bonus": "additional"
+      },
+      "window_months": 6,
+      "source": "I05",
+      "section": "linhas 9–17",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "CI-08",
+      "title": "Ação de promoção da marca no ecossistema cearense",
+      "scope": "all",
+      "types": {
+        "horizontal": "additional",
+        "vertical": "additional",
+        "bonus": "additional"
+      },
+      "window_months": null,
+      "source": "I05",
+      "section": "linhas 9–17",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "CI-09",
+      "title": "Melhoria/inovação com impacto mensurável em eficiência, qualidade ou resultados estratégicos",
+      "scope": "all",
+      "types": {
+        "horizontal": "additional",
+        "vertical": "additional",
+        "bonus": "additional"
+      },
+      "window_months": null,
+      "source": "I05",
+      "section": "linhas 9–17",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "OP-01",
+      "title": "Inglês no nível esperado para função/senioridade",
+      "scope": "Operação",
+      "types": {
+        "horizontal": "additional",
+        "vertical": "additional",
+        "bonus": "additional"
+      },
+      "window_months": null,
+      "source": "I06",
+      "section": "linhas 9–16",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "OP-02",
+      "title": "Reconhecimento formal do cliente",
+      "scope": "Operação",
+      "types": {
+        "horizontal": "additional",
+        "vertical": "additional",
+        "bonus": "additional"
+      },
+      "window_months": 12,
+      "source": "I06",
+      "section": "linhas 9–16",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "OP-03",
+      "title": "Submissão de artigo científico ou depósito de propriedade intelectual em interesse institucional",
+      "scope": "Operação",
+      "types": {
+        "horizontal": "additional",
+        "vertical": "additional",
+        "bonus": "additional"
+      },
+      "window_months": 12,
+      "source": "I06",
+      "section": "linhas 9–16",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "OP-04",
+      "title": "Participação em PoC da IN&N",
+      "scope": "Operação",
+      "types": {
+        "horizontal": "additional",
+        "vertical": "additional",
+        "bonus": "additional"
+      },
+      "window_months": 12,
+      "source": "I06",
+      "section": "linhas 9–16",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "OP-05",
+      "title": "Uma certificação alinhada às necessidades organizacionais",
+      "scope": "Operação",
+      "types": {
+        "horizontal": "additional",
+        "vertical": "additional",
+        "bonus": "additional"
+      },
+      "window_months": 12,
+      "source": "I06",
+      "section": "linhas 9–16",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "OP-06",
+      "title": "Contribuição transversal entre projetos/portfólios",
+      "scope": "Operação",
+      "types": {
+        "horizontal": "additional",
+        "vertical": "additional",
+        "bonus": "additional"
+      },
+      "window_months": 12,
+      "source": "I06",
+      "section": "linhas 9–16",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "OP-07",
+      "title": "Ampliação do nível de formação",
+      "scope": "Operação",
+      "types": {
+        "horizontal": "additional",
+        "vertical": "additional",
+        "bonus": "additional"
+      },
+      "window_months": 12,
+      "source": "I06",
+      "section": "linhas 9–16",
+      "validity_confirmation": "pending"
+    },
+    {
+      "id": "OP-08",
+      "title": "Adaptação a função, mercado, metodologia ou tecnologia",
+      "scope": "Operação",
+      "types": {
+        "horizontal": "additional",
+        "vertical": "additional",
+        "bonus": "additional"
+      },
+      "window_months": 12,
+      "source": "I06",
+      "section": "linhas 9–16",
+      "validity_confirmation": "pending"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "version": "provided-2025-policy",
+  "confirmation": "pending",
+  "source": "I04",
+  "boxes": {
+    "1C": {
+      "max_horizontal_steps": 2,
+      "vertical_possible": true,
+      "max_bonus_percent": 60
+    },
+    "1B": {
+      "max_horizontal_steps": 1,
+      "max_bonus_percent": 40
+    },
+    "2C": {
+      "max_horizontal_steps": 1,
+      "max_bonus_percent": 40
+    },
+    "2B": {
+      "max_bonus_percent": 20
+    }
+  },
+  "automatic_entitlement": false,
+  "budget_and_leadership_decision": true,
+  "minimum_interval_months": null,
+  "minimum_interval_confirmation": "not_found_in_provided_sources",
+  "normalization_algorithm": null,
+  "box_limits_by_cycle": null
+}

@@ -1,0 +1,11 @@
+# Changelog
+
+## 0.1.0 — 03/10/2026
+
+- Implementados CLI e armazenamento por snapshots verificados, propostas e controle de revisão.
+- Implementados setup, conexão por symlink, Git local, fontes, indicadores, exportação, backup/restauração e ciclos.
+- Criados sete agentes, catorze skills, nove prompts e três instruções especializadas.
+- Processadas regras fornecidas, mantendo anotações pessoais fora do núcleo.
+- Decisão ADR-001: snapshot completo é canônico; tabelas/Markdown por ciclo são visões.
+- Limites: sem escrita automática no Team Guide, inferência embutida ou conversão de schemas históricos desconhecidos; instalação e contexto Copilot requerem testes no computador do participante.
+- Vigência, datas reais, fórmula técnica, limites 9box e eventual intervalo mínimo entre promoções permanecem por confirmar.

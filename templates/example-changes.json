@@ -1,0 +1,38 @@
+[
+  {
+    "op": "profile",
+    "value": {
+      "seniority": "Júnior",
+      "weekly_capacity_hours": 2
+    }
+  },
+  {
+    "op": "upsert",
+    "collection": "objectives",
+    "value": {
+      "id": "obj-comunicacao",
+      "title": "Melhorar comunicação de resultados",
+      "description": "Relatos concisos e úteis ao time"
+    }
+  },
+  {
+    "op": "upsert",
+    "collection": "actions",
+    "value": {
+      "id": "action-oficina",
+      "title": "Preparar oficina de um problema recorrente",
+      "status": "planned",
+      "description": "Preparar material e conduzir sessão após alinhamento do público e agenda.",
+      "effort_hours": 5,
+      "objective_ids": [
+        "obj-comunicacao"
+      ],
+      "criterion_ids": [
+        "CI-06"
+      ],
+      "evidence_ids": [],
+      "source_ids": [],
+      "depends_on": []
+    }
+  }
+]

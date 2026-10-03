@@ -1,0 +1,231 @@
+{
+  "version": "2025-07-29",
+  "source": "I07",
+  "official_percentage_formula": null,
+  "skills": [
+    {
+      "id": "DEVOPS-01",
+      "name": "Inglês (Avaliação feita via teste da Geo English)",
+      "description": "Conduzir reuniões, comunicar-se com clareza, liderar discussões e responder dúvidas de forma objetiva. É fundamental compreender sotaques, nuances culturais e terminologias específicas, além de adaptar a linguagem ao público. A escuta ativa e a capacidade de engajar os participantes garantem reuniões eficazes.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Nível 1",
+        "Trainee": "Nível 1",
+        "Júnior": "Nível 2",
+        "Pleno": "Nível 2+",
+        "Sênior": "Nível 3",
+        "Especialista": "Nível 3",
+        "Consultor": "Nível 3"
+      },
+      "personal_annotations_removed": true
+    },
+    {
+      "id": "DEVOPS-02",
+      "name": "Metodologias Ágeis",
+      "description": "Compreensão e aplicação de princípios ágeis (Scrum, Kanban, Lean, XP) no contexto de engenharia e operações. Envolve colaboração com times multifuncionais, entrega contínua de valor, automação de processos e melhoria constante no ciclo de desenvolvimento e entrega de software. Entender e aplicar cerimônias como daily, planning e retrospectiva, trabalhar com sprints e priorização de backlog, e adaptar entregas de forma iterativa.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Não tem",
+        "Trainee": "Tem conhecimento",
+        "Júnior": "CH Básico",
+        "Pleno": "CH Intermediário",
+        "Sênior": "CH Multiplicador",
+        "Especialista": "CH Multiplicador",
+        "Consultor": "CH Multiplicador"
+      },
+      "personal_annotations_removed": true
+    },
+    {
+      "id": "DEVOPS-03",
+      "name": "Administração de BD",
+      "description": "Capacidade de instalar, configurar, monitorar e otimizar bancos de dados relacionais (como PostgreSQL, MySQL, SQL Server) e não relacionais (como MongoDB, Redis), cobrindo instalação, configuração, backup/restore, replicação, tunning de queries e segurança. Inclui também práticas de alta disponibilidade e monitoramento de performance.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Não tem",
+        "Trainee": "Não tem",
+        "Júnior": "Tem conhecimento",
+        "Pleno": "CH Intermediário",
+        "Sênior": "CH Avançado",
+        "Especialista": "CH Multiplicador",
+        "Consultor": "CH Multiplicador"
+      },
+      "personal_annotations_removed": true
+    },
+    {
+      "id": "DEVOPS-04",
+      "name": "Computação em Nuvem",
+      "description": "Conhecimento de plataformas de cloud computing (AWS, Azure, GCP), incluindo arquitetura, provisionamento e gerenciamento de recursos com foco em escalabilidade, segurança e otimização de custos (FinOps). Envolve conhecimento em serviços de computação, rede, armazenamento, banco de dados e observabilidade. Exemplo, na AWS, o uso de serviços como EC2, S3, RDS, IAM, entre outros.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Não tem",
+        "Trainee": "Tem conhecimento",
+        "Júnior": "CH Básico",
+        "Pleno": "CH Intermediário",
+        "Sênior": "CH Avançado",
+        "Especialista": "CH Multiplicador",
+        "Consultor": "CH Multiplicador"
+      },
+      "personal_annotations_removed": true
+    },
+    {
+      "id": "DEVOPS-05",
+      "name": "Administração de Servidores",
+      "description": "Gerenciamento de servidores Linux e/ou Windows, com foco em instalação, configuração de rede, permissões, serviços, atualizações, monitoramento de desempenho, troubleshooting e resolução de incidentes. Avalia-se também a automação de tarefas administrativas e manutenção preventiva.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Não tem",
+        "Trainee": "CH Básico",
+        "Júnior": "CH Básico",
+        "Pleno": "CH Intermediário",
+        "Sênior": "CH Avançado",
+        "Especialista": "CH Multiplicador",
+        "Consultor": "CH Multiplicador"
+      },
+      "personal_annotations_removed": true
+    },
+    {
+      "id": "DEVOPS-06",
+      "name": "Containers",
+      "description": "Criação, configuração e gerenciamento de containers usando Docker ou similares. Inclui conhecimento de imagens, volumes, redes, Dockerfiles e uso de containers em ambientes de desenvolvimento e produção com foco em isolamento, portabilidade e escalabilidade. Ferramentas comuns: Docker, Podman.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Não tem",
+        "Trainee": "CH Básico",
+        "Júnior": "CH Básico",
+        "Pleno": "CH Intermediário",
+        "Sênior": "CH Avançado",
+        "Especialista": "CH Multiplicador",
+        "Consultor": "CH Multiplicador"
+      },
+      "personal_annotations_removed": true
+    },
+    {
+      "id": "DEVOPS-07",
+      "name": "Segurança de Aplicação",
+      "description": "Aplicação de práticas e ferramentas para garantir a segurança de aplicações e infraestruturas. Inclui controle de acesso, análise de vulnerabilidades, gestão de certificados, criptografia, hardening de servidores, integração de segurança no ciclo DevOps (DevSecOps), revisão de código e compliance.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Não tem",
+        "Trainee": "Não tem",
+        "Júnior": "Tem conhecimento",
+        "Pleno": "CH Básico",
+        "Sênior": "CH Intermediário",
+        "Especialista": "CH Avançado",
+        "Consultor": "CH Multiplicador"
+      },
+      "personal_annotations_removed": true
+    },
+    {
+      "id": "DEVOPS-08",
+      "name": "Ferramentas de automação (Ansible ou similares)",
+      "description": "Uso de ferramentas como Ansible, Chef ou Puppet para automatizar provisionamento, configuração e gerenciamento de infraestrutura. Envolve escrita de playbooks/scripts reutilizáveis e integração com pipelines de CI/CD para entrega ágil e padronizada. Com isso, permite padronização, repetibilidade e redução de erros operacionais.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Não tem",
+        "Trainee": "Tem conhecimento",
+        "Júnior": "CH Básico",
+        "Pleno": "CH Intermediário",
+        "Sênior": "CH Avançado",
+        "Especialista": "CH Avançado",
+        "Consultor": "CH Multiplicador"
+      },
+      "personal_annotations_removed": true
+    },
+    {
+      "id": "DEVOPS-09",
+      "name": "Ferramentas de IaC(Terraform ou similares)",
+      "description": "Criação e manutenção de infraestrutura como código, utilizando ferramentas como Terraform, Pulumi ou AWS CloudFormation. Inclui modularização, reuso, integração com pipelines e práticas de governança. Permite versionamento, reprodutibilidade e automação da infraestrutura com controle, rastreabilidade e escalabilidade.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Não tem",
+        "Trainee": "Tem conhecimento",
+        "Júnior": "CH Básico",
+        "Pleno": "CH Intermediário",
+        "Sênior": "CH Avançado",
+        "Especialista": "CH Avançado",
+        "Consultor": "CH Multiplicador"
+      },
+      "personal_annotations_removed": true
+    },
+    {
+      "id": "DEVOPS-10",
+      "name": "Linguaguem de Programação",
+      "description": "Habilidade em linguagens como Python, Go, Java e Java Script ou outras utilizadas em automação, criação de scripts personalizados, integração com APIs e suporte a ferramentas DevOps. Avalia-se a capacidade de escrever códigos limpos, eficientes e reutilizáveis para resolver problemas operacionais.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Não tem",
+        "Trainee": "Tem conhecimento",
+        "Júnior": "CH Básico",
+        "Pleno": "CH Intermediário",
+        "Sênior": "CH Avançado",
+        "Especialista": "CH Avançado",
+        "Consultor": "CH Avançado"
+      },
+      "personal_annotations_removed": true
+    },
+    {
+      "id": "DEVOPS-11",
+      "name": "Linguagem de Script(Shell Script ou PowerShell)",
+      "description": "Criação e manutenção de scripts visando a automação de tarefas em sistemas operacionais. Envolve conhecimento de comandos e lógica de script em ambientes Unix/Linux (Shell Script) ou Windows (PowerShell), incluindo manipulação de arquivos, agendamento e configuração de serviços.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Não tem",
+        "Trainee": "Tem conhecimento",
+        "Júnior": "CH Básico",
+        "Pleno": "CH Intermediário",
+        "Sênior": "CH Avançado",
+        "Especialista": "CH Avançado",
+        "Consultor": "CH Multiplicador"
+      },
+      "personal_annotations_removed": true
+    },
+    {
+      "id": "DEVOPS-12",
+      "name": "Pipelines CI/CD",
+      "description": "Planejamento, implementação e monitoramento de pipelines de integração e entrega contínua utilizando ferramentas como Jenkins, GitLab CI, CircleCI, GitHub Actions, entre outras. Avalia-se a capacidade de orquestrar testes, builds, deploys e rollback de forma automatizada e segura.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Não tem",
+        "Trainee": "Tem conhecimento",
+        "Júnior": "CH Básico",
+        "Pleno": "CH Intermediário",
+        "Sênior": "CH Multiplicador",
+        "Especialista": "CH Multiplicador",
+        "Consultor": "CH Multiplicador"
+      },
+      "personal_annotations_removed": true
+    },
+    {
+      "id": "DEVOPS-13",
+      "name": "Ferramentas de Versionamento (Git ou similares)",
+      "description": "Uso de sistemas de controle de versão (Git, Mercurial, etc.) para gestão de código-fonte, configuração de repositórios, resolução de conflitos e colaboração com equipes de desenvolvimento. Inclui conhecimento de fluxos como GitFlow e integração com ferramentas de CI/CD.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Não tem",
+        "Trainee": "Tem conhecimento",
+        "Júnior": "CH Básico",
+        "Pleno": "CH Intermediário",
+        "Sênior": "CH Multiplicador",
+        "Especialista": "CH Multiplicador",
+        "Consultor": "CH Multiplicador"
+      },
+      "personal_annotations_removed": true
+    },
+    {
+      "id": "DEVOPS-14",
+      "name": "Orquestração de Serviços (Kubernetes ou similares)",
+      "description": "Habilidade para gerenciar aplicações containerizadas em clusters, configurando deployments, services, ingress, autoscaling (HPA/VPA), segurança e monitoramento. Envolve também upgrades de cluster e tuning de performance. Ferramentas comuns: Kubernetes, OpenShift, Rancher, Helm.",
+      "source": "I07",
+      "levels": {
+        "Estagiário": "Não tem",
+        "Trainee": "Tem conhecimento",
+        "Júnior": "CH Básico",
+        "Pleno": "CH Intermediário",
+        "Sênior": "CH Multiplicador",
+        "Especialista": "CH Multiplicador",
+        "Consultor": "CH Multiplicador"
+      },
+      "personal_annotations_removed": true
+    }
+  ]
+}

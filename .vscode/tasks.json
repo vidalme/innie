@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "PDI: preparar espaço",
+      "type": "process",
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/scripts/pdi.py",
+        "setup"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "PDI: verificar ambiente",
+      "type": "process",
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/scripts/pdi.py",
+        "doctor"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "PDI: atualizar painel",
+      "type": "process",
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/scripts/pdi.py",
+        "render"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "PDI: ver estado",
+      "type": "process",
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/scripts/pdi.py",
+        "state"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

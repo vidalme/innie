@@ -1,0 +1,16 @@
+[
+  {
+    "op": "upsert",
+    "collection": "evidence",
+    "value": {
+      "id": "ev-substituir",
+      "title": "SUBSTITUIR: evidência real",
+      "occurred_on": null,
+      "source_ids": [],
+      "verification": "claimed",
+      "url": null,
+      "contribution": null,
+      "result": null
+    }
+  }
+]

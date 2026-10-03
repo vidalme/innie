@@ -1,0 +1,15 @@
+{
+  "folders": [
+    {
+      "name": "Innie",
+      "path": "."
+    }
+  ],
+  "extensions": {
+    "recommendations": [
+      "ms-vscode-remote.remote-wsl",
+      "github.copilot",
+      "github.copilot-chat"
+    ]
+  }
+}

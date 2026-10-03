@@ -1,0 +1,60 @@
+{
+  "sources": [
+    {
+      "id": "I01",
+      "file": "sources/avaliacao.md",
+      "original_name": "Avaliação de Desempenho(1).md",
+      "sha256": "0ad6908ac5b2a5fa3689dc8dfbf6a0c1703c63535013e45dc5b7e1db7413cae3",
+      "scope": "institutional",
+      "current_cycle_confirmation": "pending"
+    },
+    {
+      "id": "I02",
+      "file": "sources/pdi.md",
+      "original_name": "PDI - Plano de Desempenho Individual(1).md",
+      "sha256": "088deefcc582179fa1b63ded155985d2710cc381e065481def8663e1044cd000",
+      "scope": "institutional",
+      "current_cycle_confirmation": "pending"
+    },
+    {
+      "id": "I03",
+      "file": "sources/expectativas.md",
+      "original_name": "Formulário Avaliação de Desempenho(2).md",
+      "sha256": "d4eb246a86ea1d4000da770913940722f2b7e1024bb2e06e995a1dbcc4e79887",
+      "scope": "institutional",
+      "current_cycle_confirmation": "pending"
+    },
+    {
+      "id": "I04",
+      "file": "sources/valorizacao.md",
+      "original_name": "promoção-e-bonificação(2).md",
+      "sha256": "cb30cf9163bd1dbf6606d1df6b9a6c682c9cccffc96145e7fafa8e65c918add7",
+      "scope": "institutional",
+      "current_cycle_confirmation": "pending"
+    },
+    {
+      "id": "I05",
+      "file": "sources/criterios-institucionais.html",
+      "original_name": "Critérios Institucionais(2).html",
+      "sha256": "16ab9c1286e0688f8b1b34d9fb2de521ba327cb7f60d5f670d8d4cffb8ebdca7",
+      "scope": "institutional",
+      "current_cycle_confirmation": "pending"
+    },
+    {
+      "id": "I06",
+      "file": "sources/criterios-operacao.html",
+      "original_name": "Critérios adicionais Operação(2).html",
+      "sha256": "c623e463f06806340b2017e50f7576bb8547ee7c0b513bcf158366374c514490",
+      "scope": "institutional",
+      "current_cycle_confirmation": "pending"
+    },
+    {
+      "id": "I07",
+      "file": "../competencies/devops.json",
+      "original_name": "DevOps(2).html",
+      "sha256_original_mixed": "25251a5e159730d7736523a6fd8a7808a072dc63f35eccfa37e8f77898a67734",
+      "personal_annotations_removed": true,
+      "raw_source_distributed": false
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "version": "0.1.0",
+  "institutional_version": "2025-07-29",
+  "validation_status": "pending_cycle_confirmation",
+  "criteria": "criteria/catalog.json",
+  "valuation": "policies/valuation.json",
+  "competencies": "competencies/devops.json",
+  "expectations": "sources/expectativas.md",
+  "evidence_guidance": "evidence-guidance/requirements.md",
+  "sources": "sources/registry.json",
+  "pending": "validation-decisions/pending.md"
+}
