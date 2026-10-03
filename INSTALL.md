@@ -19,7 +19,7 @@ cd ~/pdi-copilot/innie
 python3 --version
 python3 scripts/pdi.py setup
 python3 scripts/pdi.py doctor
-code pdi.code-workspace
+code .local/pdi.code-workspace
 ```
 
 Se Python/Git/Poppler estiverem ausentes, o instalador opcional executa apt somente com a flag explícita:
@@ -28,13 +28,13 @@ Se Python/Git/Poppler estiverem ausentes, o instalador opcional executa apt some
 bash scripts/install.sh --install-deps
 ```
 
-Sem essa flag, `bash scripts/install.sh` apenas prepara o espaço. Para escolher outro destino: `bash scripts/install.sh --outtie ../meu-outtie`. Instalação não publica arquivos.
+Sem essa flag, `bash scripts/install.sh` apenas prepara o espaço. `bash scripts/bootstrap.sh` sem argumentos também executa setup; com argumentos, encaminha o comando à CLI. Para escolher outro destino: `bash scripts/install.sh --outtie ../meu-outtie`. Instalação não publica arquivos.
 
 ## 3. Conferir o Copilot
 
 Confirmar que a janela do VS Code mostra conexão ao Ubuntu/WSL e a conta Copilot está autenticada. Abrir as customizações de chat e verificar agente `copiloto-desenvolvimento`, catorze skills e prompts `pdi-*`. O local da interface pode variar conforme versão.
 
-Selecionar o assistente e pedir: “Leia minha revisão atual, informe ciclo ativo e não modifique nada”. A resposta deve coincidir com `python3 scripts/pdi.py state`. Se não conseguir ler, seguir troubleshooting, usando caminhos explícitos e alternativa de duas raízes. O doctor testa filesystem, não o contexto do modelo.
+Selecionar o assistente e pedir: “Leia minha revisão atual, informe ciclo ativo e não modifique nada”. A resposta deve coincidir com `python3 scripts/pdi.py state`. Se não conseguir ler, seguir troubleshooting, usando caminhos explícitos e conferindo as duas raízes do workspace local. O doctor testa filesystem, não o contexto do modelo.
 
 ## 4. Primeiro plano
 
@@ -48,14 +48,14 @@ python3 scripts/pdi.py --outtie /home/SEU_USUARIO/espaco-anterior connect
 
 Se já houver outro conectado, use `--switch` depois de revisar os destinos. O script não apaga os espaços antigos. Espaços sem `metadata.json` não são assumidos compatíveis: importar seus documentos em novo espaço e preservar originais.
 
-## Alternativa com duas raízes
+## Workspace com duas raízes
 
 ```bash
-python3 scripts/pdi.py --outtie ../outtie connect --two-roots
+python3 scripts/pdi.py --outtie ../outtie connect
 code .local/pdi.code-workspace
 ```
 
-O workspace local abre innie e outtie e não é versionado. Os dados continuam fisicamente no outtie; não há duplicação. Na instalação padrão use `pdi.code-workspace` da raiz ou o workspace retornado pelo setup.
+Setup e connect incluem innie e o destino real do outtie no workspace local por padrão. Esse arquivo não é versionado e funciona também com destinos personalizados. O `pdi.code-workspace` da raiz abre Innie e Outtie pelo link `pessoal`; prefira o workspace local se a integração tiver dificuldade com symlinks. Os dados continuam fisicamente no outtie. Para abrir somente innie no workspace local, use `setup --no-two-roots` ou `connect --no-two-roots`; `--two-roots` continua aceito.
 
 ## Instalação a partir de Git
 

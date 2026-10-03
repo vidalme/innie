@@ -23,7 +23,7 @@ def git_check(innie):
     ignored = subprocess.run(["git", "-C", str(innie), "check-ignore", "pessoal"], capture_output=True).returncode == 0
     return {"status": "error" if private or not ignored else "ok", "tracked_private": private, "pessoal_ignored": ignored}
 
-def connect(innie, outtie, switch=False, two_roots=False):
+def connect(innie, outtie, switch=False, two_roots=True):
     innie = Path(innie).expanduser().resolve()
     root = Path(outtie).expanduser().resolve()
     if root == innie or root.is_relative_to(innie) or innie.is_relative_to(root) or ".git" in root.parts:
@@ -45,16 +45,12 @@ def connect(innie, outtie, switch=False, two_roots=False):
     local = innie / ".local"
     local.mkdir(exist_ok=True)
     write_json(local / "config.json", {"outtie": str(root), "connected_at": now(), "two_roots": two_roots})
-    folders = [{"name": "Innie", "path": "."}]
+    # Os caminhos são relativos ao arquivo salvo em .local.
+    folders = [{"name": "Innie", "path": ".."}]
     if two_roots:
-        folders.append({"name": "Meu desenvolvimento", "path": os.path.relpath(root, innie)})
+        folders.append({"name": "Outtie", "path": os.path.relpath(root, local)})
     workspace = {"folders": folders, "settings": {"files.exclude": {"**/__pycache__": True}},
                  "extensions": {"recommendations": ["ms-vscode-remote.remote-wsl", "github.copilot", "github.copilot-chat"]}}
-    write_json(innie / ".local/pdi.code-workspace", workspace)
-    # Workspace em .local usa caminhos relativos a .local, não à raiz.
-    workspace["folders"][0]["path"] = ".."
-    if two_roots:
-        workspace["folders"][1]["path"] = os.path.relpath(root, local)
     write_json(local / "pdi.code-workspace", workspace)
     return {"outtie": str(root), "symlink": str(link), "workspace": str(local / "pdi.code-workspace")}
 

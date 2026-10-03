@@ -3,6 +3,7 @@ import copy
 from types import SimpleNamespace
 import json
 import os
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -17,7 +18,7 @@ from pdi_copilot.storage import Store, digest, read_json, write_json
 from pdi_copilot.operations import (apply_proposal, backup, close_cycle, connect, create_cycle, doctor,
                                    git_check, import_source, init_git, prepare_proposal, restore, start_cycle, verify_archive)
 from pdi_copilot.views import export_pdi, overview, render
-from pdi_copilot.cli import carry, adendum
+from pdi_copilot.cli import carry, adendum, parser, run
 
 class SystemTests(unittest.TestCase):
     def setUp(self):
@@ -51,6 +52,54 @@ class SystemTests(unittest.TestCase):
     def test_link_and_doctor(self):
         connect(self.innie, self.store.root)
         self.assertTrue(doctor(self.innie, self.store)['ok'])
+
+    def test_setup_workspace_resolves_both_roots_on_repeat(self):
+        before = self.store.load()
+        with patch('pdi_copilot.cli.INNIE', self.innie):
+            for _ in range(2):
+                result = run(parser().parse_args(['--outtie', str(self.store.root), 'setup']))
+                workspace = Path(result['workspace'])
+                roots = [(workspace.parent / f['path']).resolve()
+                         for f in read_json(workspace)['folders']]
+                self.assertEqual(roots, [self.innie, self.store.root])
+        self.assertEqual(self.store.load(), before)
+
+    def test_connect_workspace_follows_custom_destination(self):
+        connect(self.innie, self.store.root)
+        target = Store(self.base / 'outro espaço'); target.initialize()
+        with patch('pdi_copilot.cli.INNIE', self.innie):
+            result = run(parser().parse_args(['--outtie', str(target.root), 'connect', '--switch']))
+        workspace = Path(result['workspace'])
+        folders = read_json(workspace)['folders']
+        self.assertEqual((workspace.parent / folders[1]['path']).resolve(), target.root)
+        self.assertEqual((self.innie / 'pessoal').resolve(), target.root)
+        self.assertTrue(self.store.root.exists())
+
+    def test_workspace_single_root_opt_out_and_legacy_flag(self):
+        with patch('pdi_copilot.cli.INNIE', self.innie):
+            for command in ('setup', 'connect'):
+                for flag, count in [('--no-two-roots', 1), ('--two-roots', 2)]:
+                    result = run(parser().parse_args(['--outtie', str(self.store.root), command, flag]))
+                    self.assertEqual(len(read_json(result['workspace'])['folders']), count)
+
+    def test_bootstrap_without_arguments_and_explicit_command(self):
+        source = Path(__file__).resolve().parents[1]
+        shutil.copytree(source / 'scripts', self.innie / 'scripts')
+        shutil.copytree(source / 'src', self.innie / 'src')
+        shutil.copyfile(source / 'pdi.code-workspace', self.innie / 'pdi.code-workspace')
+        before = self.store.load()
+        for _ in range(2):
+            result = subprocess.run(['bash', str(self.innie / 'scripts/bootstrap.sh')],
+                                    cwd=self.base, check=True, capture_output=True, text=True)
+            workspace = Path(json.loads(result.stdout)['workspace'])
+            self.assertEqual([(workspace.parent / f['path']).resolve()
+                              for f in read_json(workspace)['folders']], [self.innie, self.store.root])
+        shared = read_json(self.innie / 'pdi.code-workspace')
+        self.assertEqual([(self.innie / f['path']).resolve() for f in shared['folders']],
+                         [self.innie, self.store.root])
+        result = subprocess.run(['bash', str(self.innie / 'scripts/bootstrap.sh'), 'state'],
+                                cwd=self.base, check=True, capture_output=True, text=True)
+        self.assertEqual(json.loads(result.stdout), before)
 
     def test_connect_does_not_replace_real_folder(self):
         (self.innie/'pessoal').mkdir()

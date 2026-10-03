@@ -3,6 +3,10 @@
     {
       "name": "Innie",
       "path": "."
+    },
+    {
+      "name": "Outtie",
+      "path": "pessoal"
     }
   ],
   "extensions": {

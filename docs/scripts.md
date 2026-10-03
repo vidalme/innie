@@ -6,13 +6,13 @@ Executar no Ubuntu/WSL2 com Python 3.11+. Entrada: `python3 scripts/pdi.py`. `--
 
 | Comando | Efeito |
 | --- | --- |
-| `setup [--two-roots]` | Inicializa formato vazio ou valida existente, cria link e workspace local |
-| `connect [--switch] [--two-roots]` | Conecta estado existente; troca exige flag, não apaga o anterior |
+| `setup [--no-two-roots]` | Inicializa formato vazio ou valida existente, cria link e workspace local com innie e outtie |
+| `connect [--switch] [--no-two-roots]` | Conecta estado existente; troca exige flag, não apaga o anterior |
 | `doctor` | Verifica schema/hash, filesystem, link, Git e ferramentas opcionais; teste Copilot é manual |
 | `init-git [--scope outtie ou innie]` | git init local, idempotente, sem stage/commit/remote/push |
 | `migrate` | Reconhece schema atual; recusa/desconhece outros formatos sem modificá-los |
 
-Exemplo: `python3 scripts/pdi.py --outtie ../outtie connect --two-roots`. `setup` não converte uma pasta arbitrária preenchida sem metadata; preservá-la e usar importação assistida. Versão atual só tem schema 1, então não há migração histórica implementada.
+Duas raízes são o padrão; `--two-roots` continua aceito. `--no-two-roots` gera somente a raiz innie no workspace local. Exemplo: `python3 scripts/pdi.py --outtie ../outtie connect`. `setup` não converte uma pasta arbitrária preenchida sem metadata; preservá-la e usar importação assistida. Versão atual só tem schema 1, então não há migração histórica implementada.
 
 ## Fontes, estado e alterações
 
@@ -55,7 +55,7 @@ Window usa meses de calendário; datas exatamente no limite recebem boundary_pen
 
 ## Scripts auxiliares
 
-- `bootstrap.sh`: wrapper para CLI, sem instalação.
+- `bootstrap.sh`: sem argumentos executa setup; com argumentos encaminha à CLI. Não instala dependências.
 - `install.sh`: setup; instala Python/Git/Poppler com apt apenas com `--install-deps`.
 - `windows-prepare.ps1`: preparação opcional de WSL/VS Code com flags explícitas; exige ambiente Windows.
 - `acquire.py`: clona núcleo via URL HTTPS/SSH fornecida, sem credenciais embutidas.

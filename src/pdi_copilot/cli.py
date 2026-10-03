@@ -25,9 +25,12 @@ def parser():
     p.add_argument("--outtie", help="Espaço individual; por padrão usa pessoal/configuração local")
     commands = p.add_subparsers(dest="command", required=True)
     setup = commands.add_parser("setup", help="Preparar/conectar espaço individual")
-    setup.add_argument("--two-roots", action="store_true")
+    setup.add_argument("--two-roots", action=argparse.BooleanOptionalAction, default=True,
+                       help="Abrir innie e outtie no workspace local (padrão)")
     conn = commands.add_parser("connect", help="Conectar espaço existente")
-    conn.add_argument("--switch", action="store_true"); conn.add_argument("--two-roots", action="store_true")
+    conn.add_argument("--switch", action="store_true")
+    conn.add_argument("--two-roots", action=argparse.BooleanOptionalAction, default=True,
+                      help="Abrir innie e outtie no workspace local (padrão)")
     commands.add_parser("doctor", help="Conferir arquivos e dependências; Copilot exige teste manual")
     commands.add_parser("state", help="Imprimir estado canônico atual")
     commands.add_parser("validate", help="Validar estado atual")

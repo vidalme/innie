@@ -34,7 +34,7 @@ Não editar snapshots: isso altera hashes. Atomicidade local não torna o filesy
 
 ## ADR-002 — outtie é armazenamento real
 
-O link permite operar no innie sem cópia/sincronização bidirecional. Atualização do innie não substitui dados pessoais. Inicialização de Git do outtie é opcional. Nenhum script cria remotes ou envia dados.
+O link permite operar no innie sem cópia/sincronização bidirecional. Setup e connect geram por padrão `.local/pdi.code-workspace` com innie e o destino real do outtie como raízes. O workspace versionado da raiz usa `pessoal` para acessar o outtie conectado sem armazenar caminhos individuais. Atualização do innie não substitui dados pessoais. Inicialização de Git do outtie é opcional. Nenhum script cria remotes ou envia dados.
 
 `.gitignore` não é isolamento de acesso. Instruções e ferramentas read-only de especialistas são controles do harness, não sandbox completo. Os scripts verificam caminhos para escrita e o Git para inclusão acidental. O modelo pode ler o contexto autorizado das duas áreas; dados usados no contexto podem ir ao serviço de IA.
 

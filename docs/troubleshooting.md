@@ -3,7 +3,7 @@
 | Sintoma | Procedimento |
 | --- | --- |
 | Copilot não vê agentes | Conferir janela WSL, versão/extensão, workspace e painel de customizações; não depender só do nome da pasta |
-| Estado não carregado pelo modelo | Pedir leitura explícita de metadata/revisão; tentar workspace de duas raízes |
+| Estado não carregado pelo modelo | Pedir leitura explícita de metadata/revisão; abrir `.local/pdi.code-workspace`, gerado com duas raízes por padrão |
 | Symlink quebrado | Conferir destino real, conectar outtie correto com script; não criar cópia concorrente |
 | pessoal é pasta real | Preservar e fazer backup; não removê-la para instalar link |
 | Outro outtie conectado | Revisar destinos e usar connect --switch; ambos permanecem |

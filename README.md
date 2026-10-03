@@ -25,7 +25,7 @@ Extrair o pacote mantendo `innie` e `outtie` como pastas irmãs dentro do filesy
 cd ~/pdi-copilot/innie
 python3 scripts/pdi.py setup
 python3 scripts/pdi.py doctor
-code pdi.code-workspace
+code .local/pdi.code-workspace
 ```
 
 Selecionar o agente **copiloto-desenvolvimento** no chat e escrever “Quero começar; já tenho um PDI parcialmente preenchido”. Se preferir, usar `/pdi-iniciar`. O ambiente precisa de autenticação/licença Copilot e descoberta das customizações; faça o teste descrito em [INSTALL.md](INSTALL.md).
@@ -42,7 +42,7 @@ Interpretação de documentos, diagnóstico, planejamento, associação qualitat
 
 ## Limites explícitos
 
-Não há escrita automática no Team Guide, envio de mensagens, RAG/MCP, previsão de promoção ou servidor permanente. Não foram executados testes de inferência dentro do VS Code do participante. O acesso do Copilot a symlinks/arquivos ignorados e a descoberta de agentes devem ser validados localmente; há alternativa de workspace com duas raízes.
+Não há escrita automática no Team Guide, envio de mensagens, RAG/MCP, previsão de promoção ou servidor permanente. Não foram executados testes de inferência dentro do VS Code do participante. O acesso do Copilot a symlinks/arquivos ignorados e a descoberta de agentes devem ser validados localmente; o setup já gera um workspace com duas raízes.
 
 Regras de 2025 estão processadas e marcadas para confirmação de vigência. Datas exatas do ciclo não são pré-preenchidas. Não foi confirmada uma regra de intervalo mínimo entre promoções. `migrate` reconhece o schema 1; schemas desconhecidos são preservados e exigem migração assistida futura.
 
