@@ -23,12 +23,14 @@ Extrair o pacote mantendo `innie` e `outtie` como pastas irmãs dentro do filesy
 
 ```bash
 cd ~/pdi-copilot/innie
-python3 scripts/pdi.py setup
+bash scripts/bootstrap.sh
 python3 scripts/pdi.py doctor
 code .local/pdi.code-workspace
 ```
 
 Selecionar o agente **copiloto-desenvolvimento** no chat e escrever “Quero começar; já tenho um PDI parcialmente preenchido”. Se preferir, usar `/pdi-iniciar`. O ambiente precisa de autenticação/licença Copilot e descoberta das customizações; faça o teste descrito em [INSTALL.md](INSTALL.md).
+
+O bootstrap verifica Python e Git e termina com uma orientação legível: destino individual, workspace a abrir, revisão/ciclo a conferir no assistente e primeiro atalho. A preparação local e a verificação do assistente no editor são etapas distintas. Para automação, `bash scripts/bootstrap.sh setup --format json` devolve os mesmos dados e próximos passos em JSON.
 
 O `outtie` distribuído é vazio de informações pessoais. O link `pessoal` é criado pelo setup e ignorado pelo Git. Cada pessoa conecta seu próprio espaço, que pode ser uma pasta local ou um repositório privado opcional.
 

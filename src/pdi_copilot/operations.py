@@ -8,11 +8,27 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import zipfile
 
 from .model import PDIError, apply_operations, blank_cycle, cycle, date, find, new_id, now, valid_id, validate
 from .storage import Store, atomic, digest, inside, json_bytes, read_json, write_json
+
+def environment_status():
+    checks = {"python": sys.version.split()[0], "python_supported": sys.version_info >= (3, 11),
+              "platform_supported": os.name == "posix", "git_available": shutil.which("git") is not None,
+              "optional_tools": {x: shutil.which(x) is not None for x in ["code", "pdftotext", "tesseract"]}}
+    checks["ready"] = checks["python_supported"] and checks["platform_supported"] and checks["git_available"]
+    return checks
+
+def check_environment():
+    checks = environment_status()
+    if not checks["python_supported"] or not checks["platform_supported"]:
+        raise PDIError("Use Python 3.11 ou superior no Ubuntu/Linux; no Windows, execute no Ubuntu/WSL2. Confira INSTALL.md.")
+    if not checks["git_available"]:
+        raise PDIError("Git ausente. No Ubuntu, use bash scripts/install.sh --install-deps ou instale Git antes de preparar o espaço.")
+    return checks
 
 def git_check(innie):
     innie = Path(innie).resolve()
@@ -60,19 +76,35 @@ def connect(innie, outtie, switch=False, two_roots=True):
     return {"outtie": str(root), "symlink": str(link), "workspace": str(local / "pdi.code-workspace")}
 
 def doctor(innie, store):
-    state = store.load()
     innie = Path(innie).resolve()
-    checks = {"state": "ok", "revision": state["revision"], "outtie": str(store.root),
+    environment = environment_status()
+    checks = {"environment": environment, "outtie": str(store.root), "ok": False,
+              "copilot_context": "manual_check_required"}
+    if not (store.root / "metadata.json").exists():
+        checks.update({"state": "not_initialized", "setup_required": True,
+                       "next": "Execute bash scripts/bootstrap.sh para preparar o espaço; confira INSTALL.md."})
+        return checks
+    try:
+        state = store.load()
+    except (PDIError, OSError) as exc:
+        checks.update({"state": "error", "setup_required": False, "error": str(exc),
+                       "next": "Preserve o espaço e consulte docs/troubleshooting.md antes de alterá-lo."})
+        return checks
+    checks.update({"state": "ok", "setup_required": False, "revision": state["revision"],
               "symlink": (innie / "pessoal").is_symlink() and (innie / "pessoal").resolve() == store.root,
-              "git": git_check(innie), "wsl_detected": "microsoft" in os.uname().release.lower(),
-              "python": os.sys.version.split()[0], "optional_tools": {x: shutil.which(x) is not None for x in ["git", "code", "pdftotext", "tesseract"]}}
+              "git": git_check(innie) if environment['git_available'] else {"status": "missing"},
+              "wsl_detected": os.name == "posix" and "microsoft" in os.uname().release.lower(),
+              "python": environment['python'],
+              "optional_tools": {"git": environment['git_available'], **environment['optional_tools']}})
+    if not environment['ready']:
+        checks['next'] = "Instale Python 3.11+ e Git no Ubuntu/Linux; confira INSTALL.md."
+        return checks
     with store.lock():
         testfile = inside(store.root, store.root / ".runtime/doctor.txt")
         atomic(testfile, b"pdi-doctor")
         linked = innie / "pessoal/.runtime/doctor.txt"
         checks["filesystem_link_read"] = checks["symlink"] and linked.read_bytes() == b"pdi-doctor"
         testfile.unlink()
-    checks["copilot_context"] = "manual_check_required"
     checks["ok"] = checks["symlink"] and checks["filesystem_link_read"] and checks["git"]["status"] != "error"
     return checks
 

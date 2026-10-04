@@ -6,8 +6,8 @@ Executar no Ubuntu/WSL2 com Python 3.11+. Entrada: `python3 scripts/pdi.py`. `--
 
 | Comando | Efeito |
 | --- | --- |
-| `setup [--no-two-roots]` | Inicializa formato vazio ou valida o espaço já conectado; estado existente sem vínculo exige connect explícito |
-| `connect [--switch] [--no-two-roots]` | Conecta estado existente; troca exige flag, não apaga o anterior |
+| `setup [--no-two-roots] [--format json/text]` | Verifica Python/Git, inicializa formato vazio ou valida o espaço já conectado e orienta primeiro uso; estado existente sem vínculo exige connect explícito |
+| `connect [--switch] [--no-two-roots] [--format json/text]` | Verifica Python/Git, conecta estado existente e orienta conferência; troca exige flag, não apaga o anterior |
 | `doctor` | Verifica schema/hash, filesystem, link, Git e ferramentas opcionais; teste Copilot é manual |
 | `init-git [--scope outtie ou innie]` | git init local, idempotente, sem stage/commit/remote/push |
 | `migrate` | Reconhece schema atual; recusa/desconhece outros formatos sem modificá-los |
@@ -15,6 +15,10 @@ Executar no Ubuntu/WSL2 com Python 3.11+. Entrada: `python3 scripts/pdi.py`. `--
 Duas raízes são o padrão; `--two-roots` continua aceito. `--no-two-roots` gera somente a raiz innie no workspace local. Exemplo: `python3 scripts/pdi.py --outtie ../outtie connect`. `setup` não converte uma pasta arbitrária preenchida sem metadata; preservá-la e usar importação assistida. Versão atual só tem schema 1, então não há migração histórica implementada.
 
 Para usar um estado existente pela primeira vez, conferir o destino exibido e executar `python3 scripts/pdi.py --outtie CAMINHO connect`. `--outtie CAMINHO setup` também exige essa conexão prévia quando há estado no destino. Instalações já vinculadas pelo symlink ou pela configuração local continuam aceitando setup repetido. Para inspecionar um espaço sem conectá-lo, usar `python3 scripts/pdi.py --outtie CAMINHO state` explicitamente.
+
+Setup/connect da CLI mantêm JSON por padrão, incluindo `local_ready`, ambiente, `context_to_verify`, `copilot_context: manual_check_required` e `next_steps`. `--format text` apresenta essa orientação diretamente. O bootstrap sem argumentos e o instalador usam texto; com `bash scripts/bootstrap.sh setup --format json`, automações recebem JSON. Nenhum desses comandos abre o editor ou valida autenticação do Copilot automaticamente.
+
+Antes de setup, `doctor` devolve `state: not_initialized`, `setup_required: true` e orientação, sem criar arquivos (saída 1). Estado corrompido devolve `state: error` e orienta recuperação, sem encaminhar nova inicialização. Ambiente local válido mantém `ok: true`; o campo `copilot_context` continua indicando a verificação manual necessária.
 
 ## Fontes, estado e alterações
 

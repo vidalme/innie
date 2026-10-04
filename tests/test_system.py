@@ -162,7 +162,11 @@ class SystemTests(unittest.TestCase):
         for _ in range(2):
             result = subprocess.run(['bash', str(self.innie / 'scripts/bootstrap.sh')],
                                     cwd=self.base, check=True, capture_output=True, text=True)
-            workspace = Path(json.loads(result.stdout)['workspace'])
+            self.assertIn('Preparação local concluída.', result.stdout)
+            self.assertIn('Espaço individual já conectado.', result.stdout)
+            self.assertIn('/pdi-iniciar', result.stdout)
+            workspace = self.innie / '.local/pdi.code-workspace'
+            self.assertIn(str(workspace), result.stdout)
             self.assertEqual([(workspace.parent / f['path']).resolve()
                               for f in read_json(workspace)['folders']], [self.innie, self.store.root])
         shared = read_json(self.innie / 'pdi.code-workspace')
@@ -171,6 +175,9 @@ class SystemTests(unittest.TestCase):
         result = subprocess.run(['bash', str(self.innie / 'scripts/bootstrap.sh'), 'state'],
                                 cwd=self.base, check=True, capture_output=True, text=True)
         self.assertEqual(json.loads(result.stdout), before)
+        result = subprocess.run(['bash', str(self.innie / 'scripts/bootstrap.sh'), 'setup', '--format', 'json'],
+                                cwd=self.base, check=True, capture_output=True, text=True)
+        self.assertTrue(json.loads(result.stdout)['local_ready'])
 
     def test_new_sibling_installation_requires_connect_after_bootstrap(self):
         source = Path(__file__).resolve().parents[1]
@@ -185,7 +192,7 @@ class SystemTests(unittest.TestCase):
                                   cwd=installation, capture_output=True, text=True)
         created = bootstrap(first)
         self.assertEqual(created.returncode, 0, created.stderr)
-        self.assertTrue(json.loads(created.stdout)['initialized'])
+        self.assertIn('Espaço individual criado.', created.stdout)
         original = Store(parent / 'outtie'); before = original.load()
         refused = bootstrap(second)
         self.assertEqual(refused.returncode, 2)
@@ -198,8 +205,79 @@ class SystemTests(unittest.TestCase):
         for installation in (first, second):
             repeated = bootstrap(installation)
             self.assertEqual(repeated.returncode, 0, repeated.stderr)
-            self.assertFalse(json.loads(repeated.stdout)['initialized'])
+            self.assertIn('Espaço individual já conectado.', repeated.stdout)
         self.assertEqual(original.load(), before)
+
+    def test_preparation_guides_custom_workspace_without_optional_tools(self):
+        target = self.base / 'novo espaço com acentos'
+        actual_which = shutil.which
+        def required_only(tool):
+            return actual_which(tool) if tool == 'git' else None
+        with patch('pdi_copilot.cli.INNIE', self.innie), patch('pdi_copilot.operations.shutil.which', side_effect=required_only):
+            result = run(parser().parse_args(['--outtie', str(target), 'setup']))
+        self.assertTrue(result['initialized'])
+        self.assertTrue(result['local_ready'])
+        self.assertEqual(result['copilot_context'], 'manual_check_required')
+        self.assertEqual(result['context_to_verify'], {'revision': 0, 'active_cycle': None})
+        self.assertIn('Arquivo > Abrir Workspace', result['next_steps'][1])
+        self.assertIn(str(self.innie / '.local/pdi.code-workspace'), result['next_steps'][1])
+        self.assertIn('copiloto-desenvolvimento', result['next_steps'][2])
+        self.assertIn('/pdi-iniciar', result['next_steps'][-1])
+
+    def test_preparation_quotes_workspace_command_with_spaces(self):
+        installation = self.base / 'núcleo com espaços'; installation.mkdir()
+        target = self.base / 'outtie com espaços'
+        with patch('pdi_copilot.cli.INNIE', installation), patch('pdi_copilot.operations.shutil.which', return_value='/synthetic/tool'):
+            result = run(parser().parse_args(['--outtie', str(target), 'setup']))
+        command = result['next_steps'][1].removeprefix('Abra o workspace: ')
+        self.assertEqual(shlex.split(command), ['code', str(installation / '.local/pdi.code-workspace')])
+        self.assertEqual(shlex.split(result['next_steps'][0].removeprefix('Confira o ambiente: ')),
+                         ['python3', str(installation / 'scripts/pdi.py'), 'doctor'])
+
+    def test_missing_git_blocks_preparation_before_creating_files(self):
+        target = self.base / 'missing-git'
+        with patch('pdi_copilot.cli.INNIE', self.innie), patch('pdi_copilot.operations.shutil.which', return_value=None):
+            with self.assertRaisesRegex(PDIError, 'Git ausente'):
+                run(parser().parse_args(['--outtie', str(target), 'setup']))
+        self.assertFalse(target.exists())
+        self.assertFalse((self.innie / '.local').exists())
+
+    def test_old_python_blocks_preparation_before_creating_files(self):
+        target = self.base / 'old-python'
+        with patch('pdi_copilot.cli.INNIE', self.innie), patch('pdi_copilot.operations.sys.version_info', (3, 10, 0)):
+            with self.assertRaisesRegex(PDIError, 'Python 3.11'):
+                run(parser().parse_args(['--outtie', str(target), 'setup']))
+        self.assertFalse(target.exists())
+        self.assertFalse((self.innie / '.local').exists())
+
+    def test_doctor_before_setup_explains_next_step_without_creating_state(self):
+        store = Store(self.base / 'not-created')
+        result = doctor(self.innie, store)
+        self.assertFalse(result['ok'])
+        self.assertEqual(result['state'], 'not_initialized')
+        self.assertTrue(result['setup_required'])
+        self.assertIn('bootstrap.sh', result['next'])
+        self.assertIn('environment', result)
+        self.assertFalse(store.root.exists())
+
+    def test_doctor_corrupt_state_preserves_files_and_routes_recovery(self):
+        revision = self.store.root / 'revisions/00000000.json'; revision.write_text('{}')
+        result = doctor(self.innie, self.store)
+        self.assertFalse(result['ok'])
+        self.assertEqual(result['state'], 'error')
+        self.assertFalse(result['setup_required'])
+        self.assertIn('troubleshooting', result['next'])
+        self.assertEqual(revision.read_text(), '{}')
+
+    def test_bootstrap_without_python_explains_installation(self):
+        commands = self.base / 'commands'; commands.mkdir()
+        (commands / 'dirname').symlink_to(shutil.which('dirname'))
+        source = Path(__file__).resolve().parents[1]
+        result = subprocess.run([shutil.which('bash'), str(source / 'scripts/bootstrap.sh')],
+                                env={**os.environ, 'PATH': str(commands)}, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn('Python 3 ausente', result.stderr)
+        self.assertIn('--install-deps', result.stderr)
 
     def test_connect_does_not_replace_real_folder(self):
         (self.innie/'pessoal').mkdir()

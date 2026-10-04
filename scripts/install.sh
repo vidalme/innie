@@ -15,4 +15,4 @@ if ! command -v python3 >/dev/null; then
   echo "Python 3 ausente. Use bash scripts/install.sh --install-deps no Ubuntu." >&2
   exit 2
 fi
-exec python3 "$script_dir/pdi.py" "$@" setup
+exec python3 "$script_dir/pdi.py" "$@" setup --format text

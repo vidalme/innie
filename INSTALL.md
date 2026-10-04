@@ -17,7 +17,7 @@ No Ubuntu:
 ```bash
 cd ~/pdi-copilot/innie
 python3 --version
-python3 scripts/pdi.py setup
+bash scripts/bootstrap.sh
 python3 scripts/pdi.py doctor
 code .local/pdi.code-workspace
 ```
@@ -28,7 +28,11 @@ Se Python/Git/Poppler estiverem ausentes, o instalador opcional executa apt some
 bash scripts/install.sh --install-deps
 ```
 
-Sem essa flag, `bash scripts/install.sh` apenas prepara o espaço. `bash scripts/bootstrap.sh` sem argumentos também executa setup; com argumentos, encaminha o comando à CLI. Para escolher outro destino: `bash scripts/install.sh --outtie ../meu-outtie`. Instalação não publica arquivos.
+Sem essa flag, `bash scripts/install.sh` prepara o espaço e mostra os próximos passos. `bash scripts/bootstrap.sh` sem argumentos também executa setup com saída legível; com argumentos, encaminha o comando à CLI. Para escolher outro destino: `bash scripts/install.sh --outtie ../meu-outtie`. Instalação não publica arquivos.
+
+Preparação exige Python 3.11+ e Git e confere esses pré-requisitos antes de criar o espaço. O comando `code` é opcional: se não estiver no terminal, a mensagem orienta abrir o workspace pela interface do VS Code. Poppler também é opcional; sua ausência permite começar com outros textos ou leitura manual de PDF. O bootstrap mostra a revisão/ciclo que deve coincidir com a leitura do assistente, cujo acesso ainda precisa ser conferido no editor.
+
+Para saída estruturada: `bash scripts/bootstrap.sh setup --format json`. A CLI direta mantém JSON por padrão; use `python3 scripts/pdi.py setup --format text` ou `python3 scripts/pdi.py --outtie CAMINHO connect --format text` para orientação legível.
 
 Se o destino já contiver um estado individual e esta instalação ainda não estiver conectada a ele, a preparação para e mostra seu caminho. Confira se é o espaço que deseja usar e faça a conexão explícita conforme a seção abaixo. Para começar com outro espaço, escolha um destino novo com `python3 scripts/pdi.py --outtie ../meu-novo-outtie setup`. Mantenha uma pasta de instalação própria por pessoa. Após conectar, repetir o bootstrap reutiliza o vínculo existente.
 

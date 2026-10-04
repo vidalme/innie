@@ -2,6 +2,8 @@
 
 | Sintoma | Procedimento |
 | --- | --- |
+| Python ausente/antigo ou Git ausente | Instalar Python 3.11+ e Git no Ubuntu/Linux; no Ubuntu, `bash scripts/install.sh --install-deps` oferece a instalação explícita. No Windows, executar os scripts dentro do Ubuntu/WSL2 |
+| Doctor retorna not_initialized | Executar `bash scripts/bootstrap.sh` e seguir a orientação de primeiro uso; o diagnóstico não cria o espaço |
 | Copilot não vê agentes | Conferir janela WSL, versão/extensão, workspace e painel de customizações; não depender só do nome da pasta |
 | Estado não carregado pelo modelo | Pedir leitura explícita de metadata/revisão; abrir `.local/pdi.code-workspace`, gerado com duas raízes por padrão |
 | Symlink quebrado | Conferir destino real, conectar outtie correto com script; não criar cópia concorrente |

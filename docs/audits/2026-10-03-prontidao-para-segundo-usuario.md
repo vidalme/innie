@@ -18,6 +18,10 @@ Validação de A04: 55 testes passaram; `check_package.py` e `git diff --check` 
 
 Validação de A05: 63 testes passaram, incluindo estimativas parciais, zero explícito, ausência de capacidade/calendário, fuso provisório, seleção de critérios com área desconhecida e backup/restauração. `check_package.py` passou. A leitura atual aceita os estados anteriores; executáveis antigos que rejeitavam null em esforço/fuso não são compatíveis com todos os novos estados.
 
+**Etapa seguinte — A01:** concluída a orientação da preparação. Bootstrap sem argumentos e instalador mostram dados/workspace, conferência de ambiente e contexto, seleção do assistente e `/pdi-iniciar`. Setup/connect mantêm JSON para automação e oferecem `--format text`. Python 3.11+ e Git são verificados antes da criação; ausência de `code` permite abrir o workspace pela interface do editor. Doctor reconhece instalação ainda não preparada e orienta recuperação quando a revisão falha. Autenticação e leitura real do contexto continuam sendo conferidas no editor.
+
+Validação de A01: 70 testes passaram; `check_package.py`, `git diff --check` e sintaxe dos wrappers Bash passaram. A03–A05 foram etapas anteriores de proteção do estado e tratamento de desconhecidos; a condução do primeiro uso pelo bootstrap foi implementada nesta etapa.
+
 Para dois participantes, a arquitetura local é suficiente: cada pessoa usa seu clone e seu outtie. Não há necessidade demonstrada de servidor, contas centralizadas, banco compartilhado ou mais agentes. O esforço principal deve ir para a jornada, a confiabilidade da preparação e os testes de uso.
 
 ## Escopo e evidências

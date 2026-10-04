@@ -14,7 +14,7 @@ import sys
 from . import __version__
 from .model import PDIError, SCHEMA, cycle, find, new_id, now, validate, window
 from .operations import (apply_proposal, backup, close_cycle, connect, create_cycle, doctor, import_source,
-                         check_connection, init_git, prepare_proposal, restore, start_cycle, verify_archive)
+                         check_connection, check_environment, init_git, prepare_proposal, restore, start_cycle, verify_archive)
 from .storage import Store, read_json, write_json
 from .views import export_pdi, overview, render
 
@@ -26,9 +26,11 @@ def parser():
     p.add_argument("--outtie", help="Espaço individual; por padrão usa pessoal/configuração local")
     commands = p.add_subparsers(dest="command", required=True)
     setup = commands.add_parser("setup", help="Criar espaço individual ou preparar o já conectado")
+    setup.add_argument("--format", choices=["json", "text"], default="json", help="Formato da orientação de preparação")
     setup.add_argument("--two-roots", action=argparse.BooleanOptionalAction, default=True,
                        help="Abrir innie e outtie no workspace local (padrão)")
     conn = commands.add_parser("connect", help="Conectar espaço existente")
+    conn.add_argument("--format", choices=["json", "text"], default="json", help="Formato da orientação de preparação")
     conn.add_argument("--switch", action="store_true")
     conn.add_argument("--two-roots", action=argparse.BooleanOptionalAction, default=True,
                       help="Abrir innie e outtie no workspace local (padrão)")
@@ -103,6 +105,44 @@ def resolve(args):
         raise existing_space_error(store.root)
     return store
 
+def preparation_result(store, paths, environment, initialized=None):
+    state = store.load()
+    open_command = shlex.join(["code", paths['workspace']])
+    open_step = (f"Abra o workspace: {open_command}" if environment['optional_tools']['code'] else
+                 f"No VS Code, use Arquivo > Abrir Workspace e escolha: {paths['workspace']}")
+    cli = ["python3", str(INNIE / "scripts/pdi.py")]
+    result = {**paths, "local_ready": True, "environment": environment,
+              "copilot_context": "manual_check_required",
+              "context_to_verify": {"revision": state['revision'], "active_cycle": state['active_cycle']},
+              "next_steps": [
+                  "Confira o ambiente: " + shlex.join([*cli, 'doctor']),
+                  open_step,
+                  "No chat do Copilot, autentique sua conta e selecione o agente copiloto-desenvolvimento.",
+                  "Peça: Leia minha revisão atual, informe o ciclo ativo e não modifique nada. "
+                  "Compare a resposta com: " + shlex.join([*cli, 'state']),
+                  "Depois da conferência, use /pdi-iniciar ou escreva Quero começar; diga se já tem PDI ou rascunho."]}
+    if initialized is not None:
+        result['initialized'] = initialized
+    return result
+
+def preparation_text(result):
+    if result.get('initialized') is True:
+        space = "Espaço individual criado."
+    elif result.get('initialized') is False:
+        space = "Espaço individual já conectado."
+    else:
+        space = "Espaço individual conectado."
+    lines = ["Preparação local concluída.", space,
+             f"Seus dados: {result['outtie']}", f"Workspace: {result['workspace']}",
+             "Python e Git verificados."]
+    if not result['environment']['optional_tools']['pdftotext']:
+        lines.append("Extração de texto de PDF indisponível; você pode começar com texto ou leitura manual.")
+    context = result['context_to_verify']
+    lines.extend([f"Contexto a conferir: revisão {context['revision']}; ciclo ativo: {context['active_cycle'] or 'nenhum'}.",
+                  "A integração com o assistente aguarda verificação no editor.", "", "Próximos passos:"])
+    lines.extend(f"{i}. {step}" for i, step in enumerate(result['next_steps'], 1))
+    return '\n'.join(lines)
+
 def carry(store, args):
     if not args.approve: raise PDIError("Revise a transferência e informe --approve.")
     with store.lock():
@@ -139,14 +179,18 @@ def run(args):
         return window(args.event, args.cutoff, args.months, args.boundary_confirmed)
     if args.command == "restore": return restore(args.backup_file, args.destination)
     if args.command == "init-git" and args.scope == "innie": return init_git(INNIE)
+    environment = check_environment() if args.command in {"setup", "connect"} else None
     store = resolve(args)
     if args.command == "setup":
         check_connection(INNIE, store.root)
         if (store.root / "metadata.json").exists() and connected_outtie() != store.root:
             raise existing_space_error(store.root)
         created = store.initialize()
-        return {"initialized": created, **connect(INNIE, store.root, two_roots=args.two_roots)}
-    if args.command == "connect": return connect(INNIE, store.root, args.switch, args.two_roots)
+        paths = connect(INNIE, store.root, two_roots=args.two_roots)
+        return preparation_result(store, paths, environment, created)
+    if args.command == "connect":
+        paths = connect(INNIE, store.root, args.switch, args.two_roots)
+        return preparation_result(store, paths, environment)
     if args.command == "init-git": return init_git(store)
     if args.command == "doctor": return doctor(INNIE, store)
     if args.command == "state": return store.load()
@@ -182,8 +226,12 @@ def run(args):
 
 def main(argv=None):
     try:
-        result = run(parser().parse_args(argv))
-        print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
+        args = parser().parse_args(argv)
+        result = run(args)
+        if getattr(args, 'format', 'json') == 'text':
+            print(preparation_text(result))
+        else:
+            print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
         return 0 if result.get("ok", True) else 1
     except (PDIError, OSError, ValueError, KeyError, subprocess.CalledProcessError) as exc:
         print(json.dumps({"error": str(exc), "state_not_silently_replaced": True}, ensure_ascii=False), file=sys.stderr)
