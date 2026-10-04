@@ -30,6 +30,8 @@ bash scripts/install.sh --install-deps
 
 Sem essa flag, `bash scripts/install.sh` apenas prepara o espaço. `bash scripts/bootstrap.sh` sem argumentos também executa setup; com argumentos, encaminha o comando à CLI. Para escolher outro destino: `bash scripts/install.sh --outtie ../meu-outtie`. Instalação não publica arquivos.
 
+Se o destino já contiver um estado individual e esta instalação ainda não estiver conectada a ele, a preparação para e mostra seu caminho. Confira se é o espaço que deseja usar e faça a conexão explícita conforme a seção abaixo. Para começar com outro espaço, escolha um destino novo com `python3 scripts/pdi.py --outtie ../meu-novo-outtie setup`. Mantenha uma pasta de instalação própria por pessoa. Após conectar, repetir o bootstrap reutiliza o vínculo existente.
+
 ## 3. Conferir o Copilot
 
 Confirmar que a janela do VS Code mostra conexão ao Ubuntu/WSL e a conta Copilot está autenticada. Abrir as customizações de chat e verificar agente `copiloto-desenvolvimento`, catorze skills e prompts `pdi-*`. O local da interface pode variar conforme versão.
@@ -41,6 +43,8 @@ Selecionar o assistente e pedir: “Leia minha revisão atual, informe ciclo ati
 Informar cargo/senioridade, área, objetivo, disponibilidade e datas reais. Anexar ou importar avaliação anterior, matriz técnica e PDI parcial. Os documentos pessoais entram no `outtie`; nunca em knowledge. O assistente prepara diagnóstico e proposta. Revisar antes de aplicar compromissos.
 
 ## Conectar um `outtie` anterior
+
+O comando `connect` com o caminho escolhido confirma a utilização desse espaço. Informar apenas `--outtie CAMINHO setup` não confirma o uso de um estado existente que ainda não está conectado.
 
 ```bash
 python3 scripts/pdi.py --outtie /home/SEU_USUARIO/espaco-anterior connect

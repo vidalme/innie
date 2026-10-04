@@ -6,6 +6,7 @@ import copy
 import json
 import os
 from pathlib import Path
+import shlex
 import shutil
 import subprocess
 import sys
@@ -24,7 +25,7 @@ def parser():
     p.add_argument("--version", action="version", version=__version__)
     p.add_argument("--outtie", help="Espaço individual; por padrão usa pessoal/configuração local")
     commands = p.add_subparsers(dest="command", required=True)
-    setup = commands.add_parser("setup", help="Preparar/conectar espaço individual")
+    setup = commands.add_parser("setup", help="Criar espaço individual ou preparar o já conectado")
     setup.add_argument("--two-roots", action=argparse.BooleanOptionalAction, default=True,
                        help="Abrir innie e outtie no workspace local (padrão)")
     conn = commands.add_parser("connect", help="Conectar espaço existente")
@@ -74,15 +75,33 @@ def parser():
     ad.add_argument("--reason", required=True); ad.add_argument("--approve", action="store_true")
     return p
 
+def connected_outtie():
+    """Recuperar somente o vínculo local, sem assumir a pasta irmã."""
+    if (INNIE / "pessoal").is_symlink():
+        return (INNIE / "pessoal").resolve()
+    config = INNIE / ".local/config.json"
+    if config.exists():
+        return Path(read_json(config)["outtie"]).expanduser().resolve()
+    return None
+
+def existing_space_error(root):
+    command = shlex.join(["python3", "scripts/pdi.py", "--outtie", str(root), "connect"])
+    return PDIError(
+        f"Espaço individual existente sem vínculo com esta instalação: {root}. "
+        f"Para usar esse espaço, confira o destino e execute: {command}. "
+        "Para criar outro, use python3 scripts/pdi.py --outtie NOVO_CAMINHO setup."
+    )
+
 def resolve(args):
     if args.outtie:
         return Store(args.outtie)
-    if (INNIE / "pessoal").is_symlink():
-        return Store((INNIE / "pessoal").resolve())
-    config = INNIE / ".local/config.json"
-    if config.exists():
-        return Store(read_json(config)["outtie"])
-    return Store(INNIE.parent / "outtie")
+    connected = connected_outtie()
+    if connected is not None:
+        return Store(connected)
+    store = Store(INNIE.parent / "outtie")
+    if (store.root / "metadata.json").exists():
+        raise existing_space_error(store.root)
+    return store
 
 def carry(store, args):
     if not args.approve: raise PDIError("Revise a transferência e informe --approve.")
@@ -119,13 +138,16 @@ def run(args):
     if args.command == "window":
         return window(args.event, args.cutoff, args.months, args.boundary_confirmed)
     if args.command == "restore": return restore(args.backup_file, args.destination)
+    if args.command == "init-git" and args.scope == "innie": return init_git(INNIE)
     store = resolve(args)
     if args.command == "setup":
         check_connection(INNIE, store.root)
+        if (store.root / "metadata.json").exists() and connected_outtie() != store.root:
+            raise existing_space_error(store.root)
         created = store.initialize()
         return {"initialized": created, **connect(INNIE, store.root, two_roots=args.two_roots)}
     if args.command == "connect": return connect(INNIE, store.root, args.switch, args.two_roots)
-    if args.command == "init-git": return init_git(store if args.scope == "outtie" else INNIE)
+    if args.command == "init-git": return init_git(store)
     if args.command == "doctor": return doctor(INNIE, store)
     if args.command == "state": return store.load()
     if args.command == "validate":

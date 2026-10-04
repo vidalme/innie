@@ -3,6 +3,7 @@ import copy
 from types import SimpleNamespace
 import json
 import os
+import shlex
 import shutil
 from pathlib import Path
 import subprocess
@@ -54,6 +55,7 @@ class SystemTests(unittest.TestCase):
         self.assertTrue(doctor(self.innie, self.store)['ok'])
 
     def test_setup_workspace_resolves_both_roots_on_repeat(self):
+        connect(self.innie, self.store.root)
         before = self.store.load()
         with patch('pdi_copilot.cli.INNIE', self.innie):
             for _ in range(2):
@@ -62,6 +64,57 @@ class SystemTests(unittest.TestCase):
                 roots = [(workspace.parent / f['path']).resolve()
                          for f in read_json(workspace)['folders']]
                 self.assertEqual(roots, [self.innie, self.store.root])
+        self.assertEqual(self.store.load(), before)
+
+    def test_setup_existing_space_requires_explicit_connection(self):
+        target = Store(self.base / 'espaço existente'); target.initialize()
+        before = {p.relative_to(target.root): p.read_bytes()
+                  for p in target.root.rglob('*') if p.is_file()}
+        with patch('pdi_copilot.cli.INNIE', self.innie):
+            with self.assertRaises(PDIError) as error:
+                run(parser().parse_args(['--outtie', str(target.root), 'setup']))
+            command = shlex.join(['python3', 'scripts/pdi.py', '--outtie', str(target.root), 'connect'])
+            self.assertIn(command, str(error.exception))
+            self.assertFalse((self.innie / 'pessoal').is_symlink())
+            self.assertFalse((self.innie / '.local').exists())
+            self.assertEqual(before, {p.relative_to(target.root): p.read_bytes()
+                                     for p in target.root.rglob('*') if p.is_file()})
+            run(parser().parse_args(['--outtie', str(target.root), 'connect']))
+            self.assertFalse(run(parser().parse_args(['setup']))['initialized'])
+        self.assertEqual((self.innie / 'pessoal').resolve(), target.root)
+
+    def test_setup_creates_new_space_and_reuses_its_binding(self):
+        target = self.base / 'novo espaço'
+        with patch('pdi_copilot.cli.INNIE', self.innie):
+            self.assertTrue(run(parser().parse_args(['--outtie', str(target), 'setup']))['initialized'])
+            before = Store(target).load()
+            self.assertFalse(run(parser().parse_args(['setup']))['initialized'])
+        self.assertEqual(Store(target).load(), before)
+        self.assertEqual((self.innie / 'pessoal').resolve(), target)
+
+    def test_setup_recovers_existing_binding_from_link_or_config(self):
+        target = Store(self.base / 'custom-outtie'); target.initialize()
+        before = target.load()
+        for missing in ('pessoal', '.local/config.json'):
+            with self.subTest(missing=missing):
+                connect(self.innie, target.root)
+                (self.innie / missing).unlink()
+                with patch('pdi_copilot.cli.INNIE', self.innie):
+                    result = run(parser().parse_args(['setup']))
+                self.assertFalse(result['initialized'])
+                self.assertEqual(Path(result['outtie']), target.root)
+                self.assertEqual(target.load(), before)
+
+    def test_unconfigured_commands_do_not_assume_existing_sibling(self):
+        before = self.store.load()
+        with patch('pdi_copilot.cli.INNIE', self.innie):
+            for command in ('setup', 'state', 'doctor', 'connect'):
+                with self.subTest(command=command), self.assertRaisesRegex(PDIError, 'sem vínculo'):
+                    run(parser().parse_args([command]))
+            # Um caminho fornecido explicitamente permite inspeção sem criar vínculo.
+            self.assertEqual(run(parser().parse_args(['--outtie', str(self.store.root), 'state'])), before)
+        self.assertFalse((self.innie / 'pessoal').is_symlink())
+        self.assertFalse((self.innie / '.local').exists())
         self.assertEqual(self.store.load(), before)
 
     def test_setup_rejects_nested_destination_before_creating_state(self):
@@ -92,6 +145,7 @@ class SystemTests(unittest.TestCase):
         self.assertTrue(self.store.root.exists())
 
     def test_workspace_single_root_opt_out_and_legacy_flag(self):
+        connect(self.innie, self.store.root)
         with patch('pdi_copilot.cli.INNIE', self.innie):
             for command in ('setup', 'connect'):
                 for flag, count in [('--no-two-roots', 1), ('--two-roots', 2)]:
@@ -103,6 +157,7 @@ class SystemTests(unittest.TestCase):
         shutil.copytree(source / 'scripts', self.innie / 'scripts')
         shutil.copytree(source / 'src', self.innie / 'src')
         shutil.copyfile(source / 'pdi.code-workspace', self.innie / 'pdi.code-workspace')
+        connect(self.innie, self.store.root)
         before = self.store.load()
         for _ in range(2):
             result = subprocess.run(['bash', str(self.innie / 'scripts/bootstrap.sh')],
@@ -116,6 +171,35 @@ class SystemTests(unittest.TestCase):
         result = subprocess.run(['bash', str(self.innie / 'scripts/bootstrap.sh'), 'state'],
                                 cwd=self.base, check=True, capture_output=True, text=True)
         self.assertEqual(json.loads(result.stdout), before)
+
+    def test_new_sibling_installation_requires_connect_after_bootstrap(self):
+        source = Path(__file__).resolve().parents[1]
+        parent = self.base / 'instalações novas'; parent.mkdir()
+        first = parent / 'innie'; second = parent / 'outro-clone'
+        for installation in (first, second):
+            installation.mkdir()
+            shutil.copytree(source / 'scripts', installation / 'scripts')
+            shutil.copytree(source / 'src', installation / 'src')
+        def bootstrap(installation, *args):
+            return subprocess.run(['bash', str(installation / 'scripts/bootstrap.sh'), *args],
+                                  cwd=installation, capture_output=True, text=True)
+        created = bootstrap(first)
+        self.assertEqual(created.returncode, 0, created.stderr)
+        self.assertTrue(json.loads(created.stdout)['initialized'])
+        original = Store(parent / 'outtie'); before = original.load()
+        refused = bootstrap(second)
+        self.assertEqual(refused.returncode, 2)
+        self.assertIn(str(original.root), json.loads(refused.stderr)['error'])
+        self.assertFalse((second / 'pessoal').is_symlink())
+        self.assertFalse((second / '.local').exists())
+        self.assertEqual(original.load(), before)
+        connected = bootstrap(second, '--outtie', str(original.root), 'connect')
+        self.assertEqual(connected.returncode, 0, connected.stderr)
+        for installation in (first, second):
+            repeated = bootstrap(installation)
+            self.assertEqual(repeated.returncode, 0, repeated.stderr)
+            self.assertFalse(json.loads(repeated.stdout)['initialized'])
+        self.assertEqual(original.load(), before)
 
     def test_connect_does_not_replace_real_folder(self):
         (self.innie/'pessoal').mkdir()

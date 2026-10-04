@@ -7,6 +7,7 @@
 | Symlink quebrado | Conferir destino real, conectar outtie correto com script; não criar cópia concorrente |
 | pessoal é pasta real | Preservar e fazer backup; não removê-la para instalar link |
 | Outro outtie conectado | Revisar destinos e usar connect --switch; ambos permanecem |
+| Espaço individual existente sem vínculo | Conferir o caminho mostrado; usar `--outtie CAMINHO connect` para escolhê-lo ou `--outtie NOVO_CAMINHO setup` para criar outro |
 | Schema desconhecido | Preservar originais; criar novo espaço e importar; migrate não converte arbitrariamente |
 | Proposta desatualizada | Ler state novamente e recriar proposta, preservando motivo; não editar expected_revision |
 | Hash divergente | Parar edições, preservar pasta e restaurar backup em destino novo |

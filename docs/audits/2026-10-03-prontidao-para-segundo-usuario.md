@@ -10,6 +10,10 @@ Minha avaliação: adequado a um piloto acompanhado; ainda precisa dos ajustes p
 
 **Andamento em 03/10/2026:** A03 foi corrigido após esta auditoria. O setup agora confere o destino antes de inicializar o estado individual. Dois testes de regressão foram acrescentados; a suíte passou com 50 testes. Os resultados de 48 testes e a falha reproduzida abaixo registram a situação anterior à correção.
 
+**Etapa seguinte — A04:** implementada a conexão explícita para um estado existente sem vínculo. O comando mostra o destino e orienta `--outtie CAMINHO connect` ou a criação em outra pasta. Setup repetido reconhece vínculos pelo symlink ou configuração local; consultas sem vínculo também deixam de assumir a pasta irmã preenchida. A reprodução com duas instalações vizinhas está coberta por teste de bootstrap em subprocessos.
+
+Validação de A04: 55 testes passaram; `check_package.py` e `git diff --check` passaram. As novas fixtures são sintéticas e não alteram o outtie do participante.
+
 Para dois participantes, a arquitetura local é suficiente: cada pessoa usa seu clone e seu outtie. Não há necessidade demonstrada de servidor, contas centralizadas, banco compartilhado ou mais agentes. O esforço principal deve ir para a jornada, a confiabilidade da preparação e os testes de uso.
 
 ## Escopo e evidências

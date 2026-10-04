@@ -1,5 +1,9 @@
 # Changelog
 
+## Não publicado
+
+- Instalações novas exigem `connect` com destino explícito para usar um estado individual existente. Setup repetido preserva os vínculos locais; consultas sem vínculo deixam de assumir o outtie vizinho.
+
 ## 0.1.0 — 03/10/2026
 
 - Implementados CLI e armazenamento por snapshots verificados, propostas e controle de revisão.

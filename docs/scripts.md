@@ -1,18 +1,20 @@
 # Scripts e CLI — referência
 
-Executar no Ubuntu/WSL2 com Python 3.11+. Entrada: `python3 scripts/pdi.py`. `--outtie PATH` é uma opção global e deve vir **antes** do comando. Sem ela, resolve symlink pessoal, configuração local ou a pasta irmã outtie.
+Executar no Ubuntu/WSL2 com Python 3.11+. Entrada: `python3 scripts/pdi.py`. `--outtie PATH` é uma opção global e deve vir **antes** do comando. Sem ela, resolve symlink pessoal ou configuração local. Sem vínculo, a pasta irmã outtie é sugerida para criação; se já contiver estado, o comando orienta uma conexão explícita antes de usá-lo. Isso também impede que `state` ou `doctor` assumam automaticamente um espaço vizinho.
 
 ## Preparação
 
 | Comando | Efeito |
 | --- | --- |
-| `setup [--no-two-roots]` | Inicializa formato vazio ou valida existente, cria link e workspace local com innie e outtie |
+| `setup [--no-two-roots]` | Inicializa formato vazio ou valida o espaço já conectado; estado existente sem vínculo exige connect explícito |
 | `connect [--switch] [--no-two-roots]` | Conecta estado existente; troca exige flag, não apaga o anterior |
 | `doctor` | Verifica schema/hash, filesystem, link, Git e ferramentas opcionais; teste Copilot é manual |
 | `init-git [--scope outtie ou innie]` | git init local, idempotente, sem stage/commit/remote/push |
 | `migrate` | Reconhece schema atual; recusa/desconhece outros formatos sem modificá-los |
 
 Duas raízes são o padrão; `--two-roots` continua aceito. `--no-two-roots` gera somente a raiz innie no workspace local. Exemplo: `python3 scripts/pdi.py --outtie ../outtie connect`. `setup` não converte uma pasta arbitrária preenchida sem metadata; preservá-la e usar importação assistida. Versão atual só tem schema 1, então não há migração histórica implementada.
+
+Para usar um estado existente pela primeira vez, conferir o destino exibido e executar `python3 scripts/pdi.py --outtie CAMINHO connect`. `--outtie CAMINHO setup` também exige essa conexão prévia quando há estado no destino. Instalações já vinculadas pelo symlink ou pela configuração local continuam aceitando setup repetido. Para inspecionar um espaço sem conectá-lo, usar `python3 scripts/pdi.py --outtie CAMINHO state` explicitamente.
 
 ## Fontes, estado e alterações
 
