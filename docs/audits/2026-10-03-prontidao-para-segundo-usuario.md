@@ -14,6 +14,10 @@ Minha avaliação: adequado a um piloto acompanhado; ainda precisa dos ajustes p
 
 Validação de A04: 55 testes passaram; `check_package.py` e `git diff --check` passaram. As novas fixtures são sintéticas e não alteram o outtie do participante.
 
+**Etapa seguinte — A05:** corrigido o tratamento de desconhecidos. Esforço ausente/null deixa o total pendente, com soma conhecida e lista das ações sem estimativa. Sobrecarga já demonstrada pela soma conhecida permanece sinalizada. Novos perfis começam sem respostas presumidas; as datas automáticas declaram o uso provisório de America/Fortaleza quando faltar fuso. Fechamento do PDI começa independente do corte. Perfis, datas e valores já persistidos são preservados e continuam sujeitos a revisão por proposta.
+
+Validação de A05: 63 testes passaram, incluindo estimativas parciais, zero explícito, ausência de capacidade/calendário, fuso provisório, seleção de critérios com área desconhecida e backup/restauração. `check_package.py` passou. A leitura atual aceita os estados anteriores; executáveis antigos que rejeitavam null em esforço/fuso não são compatíveis com todos os novos estados.
+
 Para dois participantes, a arquitetura local é suficiente: cada pessoa usa seu clone e seu outtie. Não há necessidade demonstrada de servidor, contas centralizadas, banco compartilhado ou mais agentes. O esforço principal deve ir para a jornada, a confiabilidade da preparação e os testes de uso.
 
 ## Escopo e evidências

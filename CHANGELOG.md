@@ -2,6 +2,8 @@
 
 ## Não publicado
 
+- Esforço desconhecido permanece pendente no estado e nas visões; capacidade distingue total incompleto de sobrecarga já demonstrada pela soma conhecida.
+- Perfis novos começam sem respostas presumidas. Datas automáticas declaram o fuso provisório quando necessário; fechamento do PDI é informado separadamente do corte de evidências.
 - Instalações novas exigem `connect` com destino explícito para usar um estado individual existente. Setup repetido preserva os vínculos locais; consultas sem vínculo deixam de assumir o outtie vizinho.
 
 ## 0.1.0 — 03/10/2026

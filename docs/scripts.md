@@ -32,6 +32,8 @@ Para usar um estado existente pela primeira vez, conferir o destino exibido e ex
 
 Texto não é resumido automaticamente pelo export: se exceder limite, revisar no assistente. Imagens/PDF sem texto não são interpretados pelo import. pdftotext é opcional; resultado visual exige conferência. Arquivos binários são preservados.
 
+Em `status`, esforço ausente/null deixa o total pendente e aparece em `actions_missing_effort`; `known_remaining_effort_hours` mantém a soma parcial. Uma sobrecarga já demonstrada por essa soma retorna true; estimativas incompletas não retornam false. Se faltar fuso no perfil, a data automática usa America/Fortaleza e sinaliza `reference_timezone_assumed: true`. Com `--on`, a data é explícita e `reference_timezone` fica null. Em `criteria`, `area_pending: true` indica que só foram selecionados critérios comuns e ainda falta confirmar a área.
+
 ## Ciclos
 
 ```bash

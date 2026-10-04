@@ -4,6 +4,8 @@
 
 Selecionar copiloto-desenvolvimento e conversar normalmente. Não precisa memorizar comandos ou escolher especialistas. Explicar objetivo, cargo/nível e período. Se já houver plano, dizer “Já tenho PDI; quero planejar o restante do ciclo”. O assistente deve recuperar o estado e pedir só o que falta.
 
+Em um perfil novo, cargo, área, atuação em liderança e fuso horário começam pendentes. DevOps, Operação e America/Fortaleza podem ser sugeridos para este piloto; confirme o que se aplica a você. Informe o fechamento do PDI separadamente do corte de evidências. Se já houver valores registrados de uma versão anterior, revise-os com o assistente antes de usá-los como base do plano.
+
 ## Informações úteis
 
 Avaliação anterior, feedbacks, matriz de competências, PDI parcial, P2Ps, retro, entregas, certificações e aspirações. Datas reais do ciclo, cortes, disponibilidade e restrições são essenciais. Pode começar sem todas as informações: desconhecidos ficam registrados. Evidência que só existe em link pode ser referenciada, mas não será chamada de inspecionada sem leitura.
@@ -11,6 +13,8 @@ Avaliação anterior, feedbacks, matriz de competências, PDI parcial, P2Ps, ret
 ## Receber um plano
 
 Revisar prioridades, ações já assumidas, esforço, oportunidades e comprovação. Cada ação explica qual objetivo/competência apoia. O sistema prioriza requisitos que podem bloquear elegibilidade, mas não obriga cumprir todos os adicionais. Não aceite um plano que depende continuamente de ampliar a jornada.
+
+Quando faltar estimar uma ação, o painel mostra esforço total pendente e a soma das estimativas já informadas. Isso ainda não permite afirmar que o plano cabe no tempo disponível. Se essa soma já ultrapassar sua capacidade, o alerta de sobrecarga aparece mesmo com outras estimativas pendentes. Zero horas representa uma estimativa explícita; deixe desconhecido o que você ainda não consegue estimar.
 
 ## Registrar novidade
 

@@ -158,6 +158,7 @@ def run(args):
         records = [{**c, "classification": c["types"][args.type]} for c in catalog["criteria"]
                    if c["scope"] == "all" or area in {c["scope"].casefold(), "operacao"} and c["scope"] == "Operação"]
         return {"type": args.type, "policy_confirmation": catalog["cycle_validity"], "criteria": records,
+                "area_pending": state["profile"].get("area") is None,
                 "minimum_interval_between_promotions": "not_confirmed", "official_eligibility": "not_determined"}
     if args.command == "migrate":
         state = store.load(); return {"schema_version": state["schema_version"], "migration": "not_required", "unknown_schemas": "not_modified"}

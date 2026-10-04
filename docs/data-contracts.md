@@ -10,11 +10,15 @@ Schema atual: 1. IDs: até 80 caracteres, letras/números/hífen/underscore, sem
 
 name, role, seniority, step, area, client, timezone, weekly_capacity_hours, leadership. Pode incluir histórico, objetivos de carreira, promotion_received_on e origem de avaliações. weekly_capacity_hours é disponibilidade de desenvolvimento acordada; não total da jornada. O valor padrão é desconhecido. leadership determina perguntas exclusivas de liderança, não senioridade.
 
+Novos perfis começam com esses campos em null. `leadership: null` significa que ainda falta perguntar; `false` representa uma resposta negativa. DevOps, Operação e America/Fortaleza são sugestões do piloto a confirmar no onboarding. Quando o fuso ainda não foi informado, as visões usam America/Fortaleza provisoriamente e declaram essa suposição; ela não é gravada como resposta no perfil. `status --on DATA` usa a data explícita sem depender de fuso.
+
 ## Ciclo
 
 id, label, status, starts_on, ends_on, evidence_cutoff_on, pdi_closes_on, evaluation_on, policy_version, policy_confirmation, milestones e seis coleções: objectives, actions, criterion_assessments, competency_assessments, metrics, events. Milestones contém objetos com `on` e `label`.
 
 Estados: draft, active, archived. Uma pessoa tem no máximo um ciclo ativo. Pode haver vários rascunhos. Arquivado não é editável pelo fluxo comum; adenda separados registram documentos tardios sem alterar o arquivo congelado.
+
+O fechamento do PDI (`pdi_closes_on`) começa desconhecido mesmo quando o corte de evidências está informado. Cada data é preenchida por sua própria informação, via proposta de calendário.
 
 ## Fonte
 
@@ -37,6 +41,8 @@ id, title, description, priority, competency_ids e success_criteria quando aprop
 Obrigatórios: id, title, status. Demais: description, due_on, completed_on, effort_hours, objective_ids, criterion_ids, evidence_ids, source_ids, depends_on, result, pdi_description, external_id, external_registration, carried_from.
 
 Status: proposed, planned, in_progress, done, suspended, cancelled, carried_over. `effort_hours` representa esforço restante estimado; atualizar quando avançar. `done` é realização informada e pode estar sem evidência. Prazo previsto é diferente da execução real. Canceladas/suspensas/transferidas aparecem no painel e não são automaticamente dispensadas de CI-05.
+
+Esforço ausente ou null é desconhecido; zero é uma estimativa explícita de nenhum esforço restante. Para ações planned/in_progress, `status` informa `actions_missing_effort` e a soma conhecida em `known_remaining_effort_hours`. O total `estimated_remaining_effort_hours` fica null enquanto faltar alguma estimativa. `over_capacity` fica null se não for possível concluir; fica true quando a soma conhecida já excede a capacidade calculada, mesmo havendo estimativas pendentes; false exige estimativas completas e capacidade/calendário suficientes para a comparação. A soma continua usando apenas esforço restante, com a margem operacional de 20% já existente.
 
 depends_on referencia IDs do mesmo ciclo; não pode haver dependência circular. objective_ids, source_ids e evidence_ids devem existir. criterion_ids são interpretados conforme a versão institucional selecionada; a relevância é revisada pelo assistente e pelo usuário.
 
@@ -63,3 +69,5 @@ Veja [proposals.md](proposals.md). Propostas têm versão esperada e operações
 ## Visões
 
 outputs e exports são derivados. Edição manual detectada impede substituição. `render --preserve-edits` guarda a cópia na inbox e regenera; a interpretação dessa cópia é um fluxo posterior. Não oferece importação semântica automática de qualquer Markdown.
+
+Os novos padrões não reescrevem perfis, estimativas, calendários ou archives existentes. Valores antigos que tenham sido presumidos precisam de revisão por proposta; não há como distinguir automaticamente um zero informado de um zero colocado anteriormente como padrão. A leitura atual continua aceitando estados anteriores do schema 1.

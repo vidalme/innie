@@ -57,15 +57,15 @@ def window(event_on, cutoff_on, months, boundary_confirmed=False):
 
 def blank_state():
     return {"schema_version": SCHEMA, "revision": 0, "updated_at": now(),
-            "profile": {"name": None, "role": "DevOps", "seniority": None, "step": None,
-                        "area": "Operação", "client": None, "timezone": "America/Fortaleza",
-                        "weekly_capacity_hours": None, "leadership": False},
+            "profile": {"name": None, "role": None, "seniority": None, "step": None,
+                        "area": None, "client": None, "timezone": None,
+                        "weekly_capacity_hours": None, "leadership": None},
             "active_cycle": None, "sources": [], "evidence": [], "cycles": [], "changes": []}
 
 def blank_cycle(cycle_id, label, starts_on=None, ends_on=None, cutoff_on=None, evaluation_on=None, policy_version="2025-07-29"):
     return {"id": valid_id(cycle_id), "label": label, "status": "draft",
             "starts_on": starts_on, "ends_on": ends_on, "evidence_cutoff_on": cutoff_on,
-            "pdi_closes_on": cutoff_on, "evaluation_on": evaluation_on,
+            "pdi_closes_on": None, "evaluation_on": evaluation_on,
             "policy_version": policy_version, "policy_confirmation": "pending",
             "milestones": [], **{k: [] for k in sorted(COLLECTIONS)}}
 
@@ -112,7 +112,8 @@ def validate(state):
     if not isinstance(profile, dict):
         raise PDIError("Perfil inválido.")
     try:
-        ZoneInfo(profile.get("timezone", "America/Fortaleza"))
+        if profile.get("timezone") is not None:
+            ZoneInfo(profile["timezone"])
     except Exception as exc:
         raise PDIError("Timezone inválido.") from exc
     if profile.get("weekly_capacity_hours") is not None:
@@ -173,7 +174,8 @@ def validate(state):
                 date(action["due_on"])
             if action.get("completed_on") is not None:
                 date(action["completed_on"])
-            number(action.get("effort_hours", 0), "Esforço")
+            if action.get("effort_hours") is not None:
+                number(action["effort_hours"], "Esforço")
             refs(action, "objective_ids", objective_ids)
             refs(action, "evidence_ids", evidence_ids)
             refs(action, "source_ids", source_ids)

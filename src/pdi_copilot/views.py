@@ -8,11 +8,13 @@ from zoneinfo import ZoneInfo
 from .model import PDIError, cycle, date, find, new_id
 from .storage import atomic, digest, inside, read_json, write_json
 
+DEFAULT_TIMEZONE = "America/Fortaleza"
+
 def escaped(value):
     return str(value if value is not None else "Não informado").replace("|", "\\|").replace("\n", " ")
 
 def today(state):
-    return dt.datetime.now(ZoneInfo(state["profile"].get("timezone", "America/Fortaleza"))).date()
+    return dt.datetime.now(ZoneInfo(state["profile"].get("timezone") or DEFAULT_TIMEZONE)).date()
 
 def overview(state, cycle_id=None, on=None):
     c = cycle(state, cycle_id)
@@ -23,16 +25,28 @@ def overview(state, cycle_id=None, on=None):
     missing = [a["id"] for a in actions if a["status"] == "done" and not a.get("evidence_ids")]
     changes = [a["id"] for a in actions if a["status"] in {"cancelled", "suspended", "carried_over"}]
     remaining = (date(c["evidence_cutoff_on"]) - reference).days if c.get("evidence_cutoff_on") else None
-    effort = sum(a.get("effort_hours", 0) for a in actions if a["status"] in {"planned", "in_progress"})
+    pending = [a for a in actions if a["status"] in {"planned", "in_progress"}]
+    missing_effort = [a["id"] for a in pending if a.get("effort_hours") is None]
+    known_effort = sum(a["effort_hours"] for a in pending if a.get("effort_hours") is not None)
+    effort = None if missing_effort else known_effort
     capacity = state["profile"].get("weekly_capacity_hours")
     available = max(remaining, 0) / 7 * capacity * .8 if remaining is not None and capacity is not None else None
+    over_capacity = None
+    if available is not None:
+        if known_effort > available:
+            over_capacity = True
+        elif not missing_effort:
+            over_capacity = False
     return {"cycle_id": c["id"], "revision": state["revision"], "status": c["status"], "reference_on": reference.isoformat(),
+            "reference_timezone": (state["profile"].get("timezone") or DEFAULT_TIMEZONE) if on is None else None,
+            "reference_timezone_assumed": on is None and state["profile"].get("timezone") is None,
             "days_to_cutoff": remaining, "late_actions": late, "done_without_evidence": missing,
             "changed_commitments": changes, "due_actions": len(due), "due_done": sum(a["status"] == "done" for a in due),
             "operational_completion_percent": round(100 * sum(a["status"] == "done" for a in due) / len(due), 1) if due else None,
             "official_pdi_compliance": "not_determined", "estimated_remaining_effort_hours": effort,
+            "known_remaining_effort_hours": known_effort, "actions_missing_effort": missing_effort,
             "suggested_available_hours_with_20pct_margin": available,
-            "over_capacity": effort > available if available is not None else None,
+            "over_capacity": over_capacity,
             "promotion_probability": "not_calculated", "interval_since_promotion_rule": "requires_institutional_confirmation"}
 
 def write_view(store, relative, text, preserve_edits=False):
@@ -58,13 +72,15 @@ def render(store, cycle_id=None, preserve_edits=False):
         header = f"> Gerado da revisão {state['revision']}. Edite o estado por proposta, não este arquivo.\n\n"
         title = f"# {c['label']}\n\n" + header
         plan = title + f"Início: {c.get('starts_on') or 'pendente'} • fim: {c.get('ends_on') or 'pendente'} • corte: {c.get('evidence_cutoff_on') or 'pendente'}\n\n"
+        plan += f"Fechamento do PDI: {c.get('pdi_closes_on') or 'pendente'} • avaliação: {c.get('evaluation_on') or 'pendente'}\n\n"
         plan += "## Objetivos\n\n"
         for obj in c["objectives"]:
             plan += f"- **{obj.get('title', obj['id'])}** — {obj.get('description', '')}\n"
         if not c["objectives"]: plan += "Ainda sem objetivos revisados.\n"
         plan += "\n## Ações\n\n| ID | Título | Estado | Prazo | Esforço restante | Evidências |\n| --- | --- | --- | --- | --- | --- |\n"
         for a in sorted(c["actions"], key=lambda x: x.get("due_on") or "9999"):
-            plan += f"| {a['id']} | {escaped(a['title'])} | {a['status']} | {a.get('due_on') or 'pendente'} | {a.get('effort_hours', 0)} h | {', '.join(a.get('evidence_ids', [])) or 'pendentes'} |\n"
+            effort_text = f"{a['effort_hours']} h" if a.get('effort_hours') is not None else "pendente"
+            plan += f"| {a['id']} | {escaped(a['title'])} | {a['status']} | {a.get('due_on') or 'pendente'} | {effort_text} | {', '.join(a.get('evidence_ids', [])) or 'pendentes'} |\n"
         plan += "\n## Marcos\n\n"
         for milestone in c.get("milestones", []):
             plan += f"- {milestone['on']}: {milestone.get('label', 'Revisão')}\n"
@@ -77,12 +93,20 @@ def render(store, cycle_id=None, preserve_edits=False):
             dashboard += f"- {a['title']} — {a.get('due_on') or 'prazo pendente'} ({a['id']}).\n"
         if not c["actions"]: dashboard += "- Converse com o assistente para importar ou construir seu plano.\n"
         dashboard += "\n## Pendências e indicadores\n\n"
+        dashboard += f"- Data de referência: {report['reference_on']} ({report['reference_timezone']}).\n"
+        if report['reference_timezone_assumed']:
+            dashboard += "- Fuso horário provisório do piloto; confirme seu fuso no perfil.\n"
         dashboard += f"- Dias até o corte: {report['days_to_cutoff'] if report['days_to_cutoff'] is not None else 'calendário pendente'}.\n"
         dashboard += f"- Ações em atraso: {', '.join(report['late_actions']) or 'nenhuma identificada'}.\n"
         dashboard += f"- Realizadas sem evidência: {', '.join(report['done_without_evidence']) or 'nenhuma identificada'}.\n"
         dashboard += f"- Canceladas, suspensas ou transferidas: {', '.join(report['changed_commitments']) or 'nenhuma'}; revisar efeito institucional.\n"
-        dashboard += f"- Esforço restante estimado: {report['estimated_remaining_effort_hours']} horas.\n"
-        dashboard += f"- Possível sobrecarga: {report['over_capacity'] if report['over_capacity'] is not None else 'capacidade/calendário pendente'}.\n"
+        if report['actions_missing_effort']:
+            dashboard += f"- Esforço restante total: pendente; soma das estimativas informadas: {report['known_remaining_effort_hours']} horas.\n"
+            dashboard += f"- Ações sem estimativa de esforço: {', '.join(report['actions_missing_effort'])}.\n"
+        else:
+            dashboard += f"- Esforço restante estimado: {report['estimated_remaining_effort_hours']} horas.\n"
+        capacity_text = {True: 'sim', False: 'não', None: 'a avaliar; esforço, capacidade ou calendário pendente'}[report['over_capacity']]
+        dashboard += f"- Possível sobrecarga: {capacity_text}.\n"
         dashboard += f"- Cumprimento operacional: {report['operational_completion_percent'] if report['operational_completion_percent'] is not None else 'não aplicável'}%; não equivale a CI-05 oficial.\n"
         dashboard += "- Elegibilidade, 9box e eventual intervalo mínimo entre promoções: confirmar com liderança/RH.\n"
         dashboard += "\n## P2P e entrega parcial\n\nRevise prioridades, capacidade, atrasos, qualidade das evidências e critérios desconhecidos. Solicite /pdi-p2p ou /pdi-marco ao Copiloto.\n"

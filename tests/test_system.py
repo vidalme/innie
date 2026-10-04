@@ -305,6 +305,145 @@ class SystemTests(unittest.TestCase):
         status=overview(self.store.load(),on='2027-04-01')
         self.assertEqual(status['changed_commitments'],['a1']);self.assertEqual(status['official_pdi_compliance'],'not_determined')
 
+    def test_new_profile_and_cycle_do_not_presume_personal_answers(self):
+        self.assertTrue(all(value is None for value in self.store.load()['profile'].values()))
+        self.new_cycle()
+        c = cycle(self.store.load())
+        self.assertEqual(c['evidence_cutoff_on'], '2027-04-30')
+        self.assertIsNone(c['pdi_closes_on'])
+        self.change([{'op': 'calendar', 'value': {'pdi_closes_on': '2027-04-20'}}])
+        self.assertEqual(cycle(self.store.load())['evidence_cutoff_on'], '2027-04-30')
+        self.assertEqual(cycle(self.store.load())['pdi_closes_on'], '2027-04-20')
+
+    def test_unknown_effort_persists_and_renders_as_pending(self):
+        self.new_cycle()
+        self.change([
+            {'op': 'profile', 'value': {'weekly_capacity_hours': 10}},
+            *[{'op': 'upsert', 'collection': 'actions', 'value':
+               {'id': aid, 'title': aid, 'status': 'planned', **fields}}
+              for aid, fields in [('missing', {}), ('unknown', {'effort_hours': None}),
+                                  ('zero', {'effort_hours': 0}), ('known', {'effort_hours': 2})]]
+        ])
+        before = self.store.load()
+        report = overview(before, on='2027-04-23')
+        self.assertIsNone(report['estimated_remaining_effort_hours'])
+        self.assertEqual(report['known_remaining_effort_hours'], 2)
+        self.assertEqual(report['actions_missing_effort'], ['missing', 'unknown'])
+        self.assertIsNone(report['over_capacity'])
+        render(self.store)
+        outputs = self.store.root / 'cycles/cycle-1/outputs'
+        plan = (outputs / 'plano.md').read_text()
+        self.assertIn('| missing | missing | planned | pendente | pendente |', plan)
+        self.assertIn('| unknown | unknown | planned | pendente | pendente |', plan)
+        self.assertIn('| zero | zero | planned | pendente | 0 h |', plan)
+        self.assertIn('Fechamento do PDI: pendente', plan)
+        dashboard = (outputs / 'painel.md').read_text()
+        self.assertIn('Esforço restante total: pendente', dashboard)
+        self.assertIn('estimativas informadas: 2 horas', dashboard)
+        self.assertIn('Ações sem estimativa de esforço: missing, unknown', dashboard)
+        self.assertEqual(self.store.load(), before)
+        archive = self.base / 'unknowns.zip'; backup(self.store, archive)
+        restored = self.base / 'restored'; restore(archive, restored)
+        self.assertEqual(Store(restored).load(), before)
+
+    def test_capacity_distinguishes_unknown_zero_and_known_overload(self):
+        self.new_cycle()
+        cases = [
+            # Esforços, capacidade semanal, total, soma conhecida, sobrecarga.
+            ([], 10, 0, 0, False),
+            ([None], 10, None, 0, None),
+            ([0], 10, 0, 0, False),
+            ([8], 10, 8, 8, False),
+            ([9], 10, 9, 9, True),
+            ([2, None], 10, None, 2, None),
+            ([9, None], 10, None, 9, True),
+            ([2], None, 2, 2, None),
+            ([0], 0, 0, 0, False),
+            ([None], 0, None, 0, None),
+            ([2, None], 0, None, 2, True),
+        ]
+        for efforts, capacity, total, known, overloaded in cases:
+            with self.subTest(efforts=efforts, capacity=capacity):
+                state = self.store.load()
+                state['profile']['weekly_capacity_hours'] = capacity
+                cycle(state)['actions'] = [
+                    {'id': f'a{i}', 'title': 'Fictícia', 'status': 'planned', 'effort_hours': value}
+                    for i, value in enumerate(efforts)]
+                report = overview(validate(state), on='2027-04-23')
+                self.assertEqual(report['estimated_remaining_effort_hours'], total)
+                self.assertEqual(report['known_remaining_effort_hours'], known)
+                self.assertIs(report['over_capacity'], overloaded)
+        state['active_cycle'] = None
+        cycle(state, 'cycle-1').update(status='draft', evidence_cutoff_on=None)
+        report = overview(validate(state), 'cycle-1', on='2027-04-23')
+        self.assertIsNone(report['over_capacity'])
+        self.assertIsNone(report['suggested_available_hours_with_20pct_margin'])
+
+    def test_only_planned_and_in_progress_effort_enters_capacity(self):
+        self.new_cycle()
+        statuses = ['proposed', 'done', 'suspended', 'cancelled', 'carried_over', 'in_progress']
+        self.change([{'op': 'upsert', 'collection': 'actions', 'value':
+                      {'id': status, 'title': status, 'status': status}}
+                     for status in statuses])
+        report = overview(self.store.load(), on='2027-04-23')
+        self.assertEqual(report['actions_missing_effort'], ['in_progress'])
+        self.change([{'op': 'upsert', 'collection': 'actions',
+                      'value': {'id': 'in_progress', 'effort_hours': 0}}])
+        report = overview(self.store.load(), on='2027-04-23')
+        self.assertEqual(report['actions_missing_effort'], [])
+        self.assertEqual(report['estimated_remaining_effort_hours'], 0)
+
+    def test_invalid_effort_is_still_rejected(self):
+        self.new_cycle()
+        before = self.store.load()
+        for value in (-1, float('inf'), float('nan'), True, '2'):
+            with self.subTest(value=value), self.assertRaises(PDIError):
+                self.action(effort_hours=value)
+        self.assertEqual(self.store.load(), before)
+
+    def test_timezone_fallback_is_disclosed_without_filling_profile(self):
+        self.new_cycle()
+        before = self.store.load()
+        report = overview(before)
+        self.assertEqual(report['reference_timezone'], 'America/Fortaleza')
+        self.assertTrue(report['reference_timezone_assumed'])
+        render(self.store)
+        panel = self.store.root / 'cycles/cycle-1/outputs/painel.md'
+        self.assertIn('Fuso horário provisório do piloto', panel.read_text())
+        self.assertEqual(self.store.load(), before)
+        explicit = overview(before, on='2027-04-23')
+        self.assertEqual(explicit['reference_on'], '2027-04-23')
+        self.assertIsNone(explicit['reference_timezone'])
+        self.assertFalse(explicit['reference_timezone_assumed'])
+        self.change([{'op': 'profile', 'value': {'timezone': 'UTC'}}])
+        report = overview(self.store.load())
+        self.assertEqual(report['reference_timezone'], 'UTC')
+        self.assertFalse(report['reference_timezone_assumed'])
+        with self.assertRaises(PDIError):
+            self.change([{'op': 'profile', 'value': {'timezone': 'Invalid/Zone'}}])
+
+    def test_existing_profile_calendar_and_zero_effort_are_preserved(self):
+        self.new_cycle(); self.action(effort_hours=0)
+        self.change([
+            {'op': 'profile', 'value': {'role': 'DevOps', 'area': 'Operação',
+                                      'leadership': False, 'timezone': 'America/Fortaleza'}},
+            {'op': 'calendar', 'value': {'pdi_closes_on': '2027-04-30'}}])
+        before = self.store.load()
+        self.assertFalse(self.store.initialize())
+        render(self.store)
+        self.assertEqual(self.store.load(), before)
+        self.assertEqual(overview(before)['estimated_remaining_effort_hours'], 0)
+
+    def test_criteria_exposes_unknown_area_before_selecting_operation_rules(self):
+        args = parser().parse_args(['--outtie', str(self.store.root), 'criteria'])
+        report = run(args)
+        self.assertTrue(report['area_pending'])
+        self.assertTrue(all(row['scope'] == 'all' for row in report['criteria']))
+        self.change([{'op': 'profile', 'value': {'area': 'Operação'}}])
+        report = run(args)
+        self.assertFalse(report['area_pending'])
+        self.assertTrue(any(row['scope'] == 'Operação' for row in report['criteria']))
+
     def test_manual_render_edits_preserved(self):
         self.new_cycle();self.action();render(self.store)
         view=self.store.root/'cycles/cycle-1/outputs/plano.md';view.write_text('Minha edição')
