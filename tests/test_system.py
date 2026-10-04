@@ -64,6 +64,22 @@ class SystemTests(unittest.TestCase):
                 self.assertEqual(roots, [self.innie, self.store.root])
         self.assertEqual(self.store.load(), before)
 
+    def test_setup_rejects_nested_destination_before_creating_state(self):
+        target = self.innie / 'private-state'
+        with patch('pdi_copilot.cli.INNIE', self.innie):
+            with self.assertRaises(PDIError):
+                run(parser().parse_args(['--outtie', str(target), 'setup']))
+        self.assertFalse(target.exists())
+
+    def test_setup_rejects_conflicting_link_before_creating_state(self):
+        connect(self.innie, self.store.root)
+        target = self.base / 'new-private-state'
+        with patch('pdi_copilot.cli.INNIE', self.innie):
+            with self.assertRaises(PDIError):
+                run(parser().parse_args(['--outtie', str(target), 'setup']))
+        self.assertFalse(target.exists())
+        self.assertEqual((self.innie / 'pessoal').resolve(), self.store.root)
+
     def test_connect_workspace_follows_custom_destination(self):
         connect(self.innie, self.store.root)
         target = Store(self.base / 'outro espaço'); target.initialize()

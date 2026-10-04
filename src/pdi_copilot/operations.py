@@ -23,12 +23,12 @@ def git_check(innie):
     ignored = subprocess.run(["git", "-C", str(innie), "check-ignore", "pessoal"], capture_output=True).returncode == 0
     return {"status": "error" if private or not ignored else "ok", "tracked_private": private, "pessoal_ignored": ignored}
 
-def connect(innie, outtie, switch=False, two_roots=True):
+def check_connection(innie, outtie, switch=False):
+    """Reject incompatible destinations before setup creates individual state."""
     innie = Path(innie).expanduser().resolve()
     root = Path(outtie).expanduser().resolve()
     if root == innie or root.is_relative_to(innie) or innie.is_relative_to(root) or ".git" in root.parts:
         raise PDIError("Innie e outtie devem ser pastas distintas, sem conter uma à outra.")
-    store = Store(root); store.load()
     link = innie / "pessoal"
     if link.exists() or link.is_symlink():
         if not link.is_symlink():
@@ -38,6 +38,11 @@ def connect(innie, outtie, switch=False, two_roots=True):
     ignored = git_check(innie)
     if ignored["status"] == "error":
         raise PDIError("O Git do innie inclui conteúdo individual ou não ignora pessoal. Corrija antes de conectar.")
+    return innie, root, link
+
+def connect(innie, outtie, switch=False, two_roots=True):
+    innie, root, link = check_connection(innie, outtie, switch)
+    Store(root).load()
     if not link.is_symlink() or link.resolve() != root:
         temporary = innie / (".pessoal-" + os.urandom(4).hex())
         temporary.symlink_to(os.path.relpath(root, innie), target_is_directory=True)

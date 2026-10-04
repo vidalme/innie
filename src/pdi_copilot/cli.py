@@ -13,7 +13,7 @@ import sys
 from . import __version__
 from .model import PDIError, SCHEMA, cycle, find, new_id, now, validate, window
 from .operations import (apply_proposal, backup, close_cycle, connect, create_cycle, doctor, import_source,
-                         init_git, prepare_proposal, restore, start_cycle, verify_archive)
+                         check_connection, init_git, prepare_proposal, restore, start_cycle, verify_archive)
 from .storage import Store, read_json, write_json
 from .views import export_pdi, overview, render
 
@@ -121,6 +121,7 @@ def run(args):
     if args.command == "restore": return restore(args.backup_file, args.destination)
     store = resolve(args)
     if args.command == "setup":
+        check_connection(INNIE, store.root)
         created = store.initialize()
         return {"initialized": created, **connect(INNIE, store.root, two_roots=args.two_roots)}
     if args.command == "connect": return connect(INNIE, store.root, args.switch, args.two_roots)
