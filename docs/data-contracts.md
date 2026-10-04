@@ -71,3 +71,11 @@ Veja [proposals.md](proposals.md). Propostas têm versão esperada e operações
 outputs e exports são derivados. Edição manual detectada impede substituição. `render --preserve-edits` guarda a cópia na inbox e regenera; a interpretação dessa cópia é um fluxo posterior. Não oferece importação semântica automática de qualquer Markdown.
 
 Os novos padrões não reescrevem perfis, estimativas, calendários ou archives existentes. Valores antigos que tenham sido presumidos precisam de revisão por proposta; não há como distinguir automaticamente um zero informado de um zero colocado anteriormente como padrão. A leitura atual continua aceitando estados anteriores do schema 1.
+
+## Orientação de início e retomada
+
+`onboarding` deriva a etapa de atendimento do snapshot, das propostas sem recibo de aplicação e da existência de `inbox/onboarding.md`. Não adiciona coleções ao schema nem grava respostas automaticamente. `career_goal` é uma extensão descritiva opcional do perfil; objetivos existentes no ciclo também suprem essa pergunta.
+
+Respostas candidatas ficam nas notas/propostas, com origem e situação. Somente `apply` após autorização as incorpora ao estado canônico. Propostas de revisão anterior são exibidas como `stale`; o assistente confere decisões de recusa/substituição nas notas antes de reapresentá-las. O comando não interpreta o conteúdo das notas nem elimina propostas antigas. Campos faltantes são orientação, não um bloqueio a rascunhos provisórios.
+
+`status` preserva os indicadores de ciclo e acrescenta `onboarding`. Sem ativo ou seleção explícita, retorna `status: no_active_cycle`, `cycle_id: null` e orientação com rascunhos disponíveis. Sem metadata, retorna `setup_required`. Nenhuma dessas consultas cria ou ativa um ciclo; `--cycle ID` permite consultar um rascunho sem ativá-lo.

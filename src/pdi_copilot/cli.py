@@ -16,7 +16,8 @@ from .model import PDIError, SCHEMA, cycle, find, new_id, now, validate, window
 from .operations import (apply_proposal, backup, close_cycle, connect, create_cycle, doctor, import_source,
                          check_connection, check_environment, init_git, prepare_proposal, restore, start_cycle, verify_archive)
 from .storage import Store, read_json, write_json
-from .views import export_pdi, overview, render
+from .views import export_pdi, render
+from .journey import guidance, guidance_text, status_report
 
 INNIE = Path(__file__).resolve().parents[2]
 
@@ -36,6 +37,9 @@ def parser():
                       help="Abrir innie e outtie no workspace local (padrão)")
     commands.add_parser("doctor", help="Conferir arquivos e dependências; Copilot exige teste manual")
     commands.add_parser("state", help="Imprimir estado canônico atual")
+    onboarding = commands.add_parser("onboarding", help="Orientar início/retomada a partir do estado e de propostas pendentes")
+    onboarding.add_argument("--cycle")
+    onboarding.add_argument("--format", choices=["json", "text"], default="json")
     commands.add_parser("validate", help="Validar estado atual")
     criteria = commands.add_parser("criteria", help="Listar critérios aplicáveis; não decide elegibilidade")
     criteria.add_argument("--type", choices=["horizontal", "vertical", "bonus"], default="horizontal")
@@ -52,6 +56,7 @@ def parser():
     ren.add_argument("--cycle"); ren.add_argument("--preserve-edits", action="store_true")
     status = commands.add_parser("status", help="Indicadores operacionais, sem prever promoção")
     status.add_argument("--cycle"); status.add_argument("--on")
+    status.add_argument("--format", choices=["json", "text"], default="json")
     exp = commands.add_parser("export", help="Exportar uma ação para revisão/cópia")
     exp.add_argument("action_id"); exp.add_argument("--cycle"); exp.add_argument("--max-chars", type=int, default=16000)
     exp.add_argument("--preserve-edits", action="store_true")
@@ -194,6 +199,7 @@ def run(args):
     if args.command == "init-git": return init_git(store)
     if args.command == "doctor": return doctor(INNIE, store)
     if args.command == "state": return store.load()
+    if args.command == "onboarding": return guidance(store, args.cycle)
     if args.command == "validate":
         state = store.load(); return {"valid": True, "revision": state["revision"]}
     if args.command == "criteria":
@@ -210,7 +216,7 @@ def run(args):
     if args.command == "proposal": return prepare_proposal(store, read_json(args.changes), args.reason)
     if args.command == "apply": return apply_proposal(store, args.proposal, args.approve)
     if args.command == "render": return render(store, args.cycle, args.preserve_edits)
-    if args.command == "status": return overview(store.load(), args.cycle, args.on)
+    if args.command == "status": return status_report(store, args.cycle, args.on)
     if args.command == "export": return export_pdi(store, args.action_id, args.cycle, args.max_chars, args.preserve_edits)
     if args.command == "backup": return backup(store, args.destination)
     if args.command == "cycle":
@@ -229,7 +235,7 @@ def main(argv=None):
         args = parser().parse_args(argv)
         result = run(args)
         if getattr(args, 'format', 'json') == 'text':
-            print(preparation_text(result))
+            print(guidance_text(result) if args.command in {'onboarding', 'status'} else preparation_text(result))
         else:
             print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
         return 0 if result.get("ok", True) else 1

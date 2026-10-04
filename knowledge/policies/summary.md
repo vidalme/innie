@@ -4,6 +4,8 @@
 
 Fonte: I04, seções “Tipos de Valorização”, “O que é considerado na análise?”, “Matriz 9Box” e “Regras de Valorização”; I08 para orientação visual.
 
+Disponibilidade: I08 e X02 são referências históricas não distribuídas neste pacote. As descrições abaixo não substituem a inspeção dos originais; conferir [proveniência e limitações](../sources/README.md) antes de usá-las como confirmação institucional.
+
 | Tipo | Definição na fonte |
 | --- | --- |
 | Progressão horizontal | Aumento salarial sem alteração de função/senioridade |

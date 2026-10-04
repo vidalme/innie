@@ -1,3 +1,5 @@
+> **Planejamento histórico.** Este documento descreve a proposta original e pode mencionar etapas já implementadas. Para instalar e usar a versão atual, consulte [INSTALL](../../INSTALL.md) e o [guia do colaborador](../user-guide.md). O [CHANGELOG](../../CHANGELOG.md) registra a implementação.
+
 # Innie / Outtie — especificação do copiloto de desenvolvimento profissional
 
 Versão: 0.1 • Data: 03/10/2026 • Estado: planejamento para implementação e validação do piloto.

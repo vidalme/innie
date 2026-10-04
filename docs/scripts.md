@@ -26,12 +26,13 @@ Antes de setup, `doctor` devolve `state: not_initialized`, `setup_required: true
 | --- | --- |
 | `import ARQUIVO [--kind personal/mixed/institutional/example] [--title TEXTO]` | Copia original, hash/dedupe, extração quando possível |
 | `state` | Exibe snapshot completo atual |
+| `onboarding [--cycle ID] [--format json/text]` | Orienta início/retomada, lista lacunas, notas e propostas pendentes; somente leitura |
 | `validate` | Valida estrutura, status, datas, referências e hash |
 | `criteria [--type horizontal/vertical/bonus]` | Lista critérios aplicáveis à área; vigência/elegibilidade continuam pendentes |
 | `proposal --changes JSON --reason TEXTO` | Valida operações e guarda proposta na revisão corrente |
 | `apply --proposal CAMINHO --approve` | Aplica sob lock após revisar; conflitos interrompem |
 | `render [--cycle ID] [--preserve-edits]` | Regenera plano/painel do ciclo aberto; preserva edição divergente quando solicitado |
-| `status [--cycle ID] [--on AAAA-MM-DD]` | Indicadores operacionais; sem probabilidade ou elegibilidade oficial |
+| `status [--cycle ID] [--on AAAA-MM-DD] [--format json/text]` | Indicadores e orientação; sem ciclo ativo, apresenta rascunhos/próximos passos; somente leitura |
 | `export ACTION_ID [--cycle ID] [--max-chars 16000] [--preserve-edits]` | MD/JSON para copiar ao Team Guide; conta caracteres e unidades UTF-16 |
 
 Texto não é resumido automaticamente pelo export: se exceder limite, revisar no assistente. Imagens/PDF sem texto não são interpretados pelo import. pdftotext é opcional; resultado visual exige conferência. Arquivos binários são preservados.
@@ -67,10 +68,10 @@ Window usa meses de calendário; datas exatamente no limite recebem boundary_pen
 - `install.sh`: setup; instala Python/Git/Poppler com apt apenas com `--install-deps`.
 - `windows-prepare.ps1`: preparação opcional de WSL/VS Code com flags explícitas; exige ambiente Windows.
 - `acquire.py`: clona núcleo via URL HTTPS/SSH fornecida, sem credenciais embutidas.
-- `check_package.py`: valida customizações, JSON, links e separação da distribuição; sem instalar skills pessoais.
+- `check_package.py`: verifica estrutura das customizações, JSON, links, proveniência e separação da distribuição; sem instalar skills pessoais.
 
 ## Saídas e erros
 
-JSON em stdout; erro legível em stderr. Exit 0: sucesso; 1: doctor identificou falha; 2: operação recusada/entrada inválida. Não interpretar um erro como aplicação parcial bem-sucedida. Em conflito, ler state novamente. Em hash divergente, parar e restaurar; não recalcular hash para mascarar uma edição manual.
+JSON em stdout por padrão; setup, connect, onboarding e status aceitam `--format text`. Erro legível em stderr. Exit 0: sucesso; 1: doctor identificou falha; 2: operação recusada/entrada inválida. Não interpretar um erro como aplicação parcial bem-sucedida. Em conflito, ler state novamente. Em hash divergente, parar e restaurar; não recalcular hash para mascarar uma edição manual.
 
 Scripts não têm dry-run geral: proposal é o estágio candidato de estado, e comandos mutáveis de ciclo possuem revisão explícita. Fontes são importadas diretamente porque preservam entradas autorizadas. Operações remotas de publicação são manuais.

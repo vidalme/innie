@@ -2,6 +2,11 @@
 
 ## Não publicado
 
+- Orientação de início/retomada por `onboarding` e `status --format text`; sem ciclo ativo, mostrar rascunhos/próximos passos sem criar ou ativar ciclos. Consultas expõem notas e propostas pendentes para retomada.
+- Nove atalhos com entradas/saídas distintas; início registra respostas candidatas, fechamento e novo ciclo não são mais encadeados implicitamente.
+- Instalação por clone Git como caminho principal; guia de comandos e modelo de notas de início. Planejamento original identificado como histórico.
+- Conhecimento 0.1.1: proveniência de I07/I08/X02/P01 explicitada e verificada por paths/hashes. Referências ausentes declaradas; versão institucional e pendências de vigência preservadas.
+
 - Bootstrap e instalador mostram orientação de primeiro uso, com workspace, conferência de contexto e `/pdi-iniciar`; setup/connect mantêm JSON para automação e oferecem `--format text`.
 - Preparação confere Python/Git antes da criação; doctor distingue espaço ainda não preparado de estado corrompido e orienta o próximo passo.
 - Esforço desconhecido permanece pendente no estado e nas visões; capacidade distingue total incompleto de sobrecarga já demonstrada pela soma conhecida.

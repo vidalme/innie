@@ -2,7 +2,7 @@
 
 **Versão 0.1.0: implementação inicial para piloto em VS Code + Copilot + Ubuntu/WSL2.**
 
-O produto ajuda colaboradores a transformar regras de avaliação, feedbacks e objetivos de carreira em um plano executável, acompanhado por evidências. O objetivo do piloto é melhorar preparação para valorização, inclusive até dois steps quando elegível. O sistema não concede promoção nem prevê a decisão da liderança.
+O produto ajuda colaboradores a transformar regras de avaliação, feedbacks e objetivos de carreira em um plano executável, acompanhado por evidências. Cada pessoa define seu objetivo de desenvolvimento; a preparação para valorização é um dos usos possíveis. O sistema não concede promoção nem prevê a decisão da liderança.
 
 ## Por que existe
 
@@ -19,20 +19,23 @@ Primeiro piloto: dois profissionais DevOps. Estrutura preparada para outras tril
 
 ## Começar
 
-Extrair o pacote mantendo `innie` e `outtie` como pastas irmãs dentro do filesystem Linux do WSL. No terminal Ubuntu:
+Clone o repositório interno autorizado no filesystem Linux do WSL. Substitua `URL_DO_REPOSITORIO_INTERNO` pelo endereço fornecido pelo mantenedor. No terminal Ubuntu:
 
 ```bash
+git clone URL_DO_REPOSITORIO_INTERNO ~/pdi-copilot/innie
 cd ~/pdi-copilot/innie
 bash scripts/bootstrap.sh
 python3 scripts/pdi.py doctor
 code .local/pdi.code-workspace
 ```
 
-Selecionar o agente **copiloto-desenvolvimento** no chat e escrever “Quero começar; já tenho um PDI parcialmente preenchido”. Se preferir, usar `/pdi-iniciar`. O ambiente precisa de autenticação/licença Copilot e descoberta das customizações; faça o teste descrito em [INSTALL.md](INSTALL.md).
+Selecionar o agente **copiloto-desenvolvimento** no chat e usar `/pdi-iniciar` ou dizer “Quero começar”. Ele confere se você já tem um PDI e conduz as informações faltantes em perguntas curtas. É possível começar sem documentos e retomar depois com o mesmo comando. O ambiente precisa de autenticação/licença Copilot e descoberta das customizações; faça o teste descrito em [INSTALL.md](INSTALL.md).
 
 O bootstrap verifica Python e Git e termina com uma orientação legível: destino individual, workspace a abrir, revisão/ciclo a conferir no assistente e primeiro atalho. A preparação local e a verificação do assistente no editor são etapas distintas. Para automação, `bash scripts/bootstrap.sh setup --format json` devolve os mesmos dados e próximos passos em JSON.
 
-O `outtie` distribuído é vazio de informações pessoais. O link `pessoal` é criado pelo setup e ignorado pelo Git. Cada pessoa conecta seu próprio espaço, que pode ser uma pasta local ou um repositório privado opcional.
+O bootstrap cria um `outtie` vazio, ao lado do clone, quando ainda não existe um espaço conectado. O link `pessoal` é criado pelo setup e ignorado pelo Git. Cada pessoa conecta seu próprio espaço, que pode ser uma pasta local ou um repositório privado opcional.
+
+Para consultar o próximo passo pelo terminal: `python3 scripts/pdi.py onboarding --format text`. Para acompanhar: `/pdi-status` no chat ou `python3 scripts/pdi.py status --format text`. Consulte os [atalhos e resultados esperados](docs/user-guide.md#atalhos-e-resultados).
 
 ## O que já funciona nos scripts
 

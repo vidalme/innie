@@ -6,9 +6,17 @@ Windows com WSL2 Ubuntu, VS Code, extensão WSL e Copilot autorizado. Python 3.1
 
 Verificar a distribuição no PowerShell: `wsl --list --verbose`. Se a distribuição não existir ou não estiver em versão 2, seguir [documentação oficial WSL](https://learn.microsoft.com/windows/wsl/install). O script opcional `scripts/windows-prepare.ps1` oferece `-InstallWSL` e `-InstallVSCode`; pode exigir privilégios e reinício. Ele não instala credenciais Copilot nem configura contas.
 
-## 1. Copiar os arquivos
+## 1. Clonar o núcleo
 
-Extrair o ZIP em local temporário e copiar as duas pastas irmãs para o filesystem Linux, por exemplo `~/pdi-copilot/innie` e `~/pdi-copilot/outtie`. Não copiar uma pasta dentro da outra. Não incluir `.git` de outro projeto. Os ZIPs distribuídos não contêm Git interno nem symlink pré-criado.
+Obter com o mantenedor o endereço do repositório interno e acesso pelo Git corporativo. No terminal Ubuntu, substituir o endereço abaixo:
+
+```bash
+git clone URL_DO_REPOSITORIO_INTERNO ~/pdi-copilot/innie
+```
+
+Cada participante usa seu próprio clone e espaço individual. O bootstrap cria o `outtie` fora do núcleo; não é necessário clonar ou receber dados de outra pessoa. Para aquisição automatizada, `scripts/acquire.py --innie-url URL --destination CAMINHO` apenas clona e usa a autenticação do Git.
+
+Como alternativa sem Git remoto, extrair somente o núcleo de um ZIP autorizado para uma pasta `innie` no filesystem Linux. Não copiar `.git`, `.local`, `pessoal` ou um outtie de outra pessoa. A preparação a seguir é a mesma; Git local continua sendo pré-requisito.
 
 ## 2. Preparar
 
@@ -44,7 +52,11 @@ Selecionar o assistente e pedir: “Leia minha revisão atual, informe ciclo ati
 
 ## 4. Primeiro plano
 
-Informar cargo/senioridade, área, objetivo, disponibilidade e datas reais. Anexar ou importar avaliação anterior, matriz técnica e PDI parcial. Os documentos pessoais entram no `outtie`; nunca em knowledge. O assistente prepara diagnóstico e proposta. Revisar antes de aplicar compromissos.
+Usar `/pdi-iniciar`. O assistente verifica ciclos e respostas já registrados, pergunta se existe PDI e solicita somente o necessário para o próximo resultado. Cargo, objetivo, disponibilidade e datas podem ser preenchidos aos poucos; datas desconhecidas ficam pendentes em um rascunho.
+
+Documentos são opcionais para começar. Se houver avaliação anterior ou PDI parcial, usar `/pdi-importar`; eles entram no `outtie`, nunca em knowledge. Revisar a proposta antes de aplicar compromissos. Para retomar outra sessão, usar `/pdi-iniciar`; `/pdi-status` também informa o próximo passo quando não há ciclo ativo.
+
+Sem chat, `python3 scripts/pdi.py onboarding --format text` consulta a orientação. A CLI não interpreta suas respostas: o assistente as registra em notas/propostas e aplica apenas o que foi autorizado. Veja o [guia](docs/user-guide.md).
 
 ## Conectar um `outtie` anterior
 
@@ -65,6 +77,6 @@ code .local/pdi.code-workspace
 
 Setup e connect incluem innie e o destino real do outtie no workspace local por padrão. Esse arquivo não é versionado e funciona também com destinos personalizados. O `pdi.code-workspace` da raiz abre Innie e Outtie pelo link `pessoal`; prefira o workspace local se a integração tiver dificuldade com symlinks. Os dados continuam fisicamente no outtie. Para abrir somente innie no workspace local, use `setup --no-two-roots` ou `connect --no-two-roots`; `--two-roots` continua aceito.
 
-## Instalação a partir de Git
+## Atualizações
 
-Depois de publicar o núcleo no repositório autorizado, clonar com Git ou `scripts/acquire.py --innie-url URL --destination CAMINHO`. O script só clona; autenticação é feita pelo Git corporativo. Preparar um outtie local com setup. Remotes individuais são opcionais e escolhidos pelo usuário.
+Atualizar o clone pelo Git preservando mudanças locais e conferir `doctor` novamente. Dados pessoais permanecem no outtie. Publicação e revisão de fontes são tarefas do mantenedor: veja [manutenção](docs/maintenance.md). Remotes individuais são opcionais e escolhidos pelo usuário.

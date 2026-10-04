@@ -22,6 +22,12 @@ Validação de A05: 63 testes passaram, incluindo estimativas parciais, zero exp
 
 Validação de A01: 70 testes passaram; `check_package.py`, `git diff --check` e sintaxe dos wrappers Bash passaram. A03–A05 foram etapas anteriores de proteção do estado e tratamento de desconhecidos; a condução do primeiro uso pelo bootstrap foi implementada nesta etapa.
 
+**Etapa seguinte — A07, A02 e A06:** implementada a entrada por clone Git, com ZIP como alternativa, manutenção separada e aviso no planejamento histórico. A proveniência usa caminhos relativos a knowledge e hashes dos artefatos distribuídos; I08/X02 estão explicitamente ausentes e P01 é somente extrato sanitizado. A versão de conhecimento passa a 0.1.1 sem revalidar normas.
+
+`onboarding` e `status --format text` derivam próximos passos do estado, rascunhos, notas e propostas. Status sem ciclo deixa de falhar; rascunhos exigem escolha explícita. A skill de início registra respostas candidatas e recupera notas/propostas antes de novas perguntas, permitindo documentos e dados ainda pendentes. Os nove prompts definem entradas e resultados; fechamento e novo ciclo são operações separadas.
+
+Validação desta etapa: 78 testes automatizados, check_package e validação das duas skills alteradas. Dois clones Git locais de uma distribuição limpa passaram por bootstrap, doctor, status e onboarding; repetição preservou estado, os espaços foram distintos e as árvores Git permaneceram limpas. Os testes simulam a persistência/recuperação de duas respostas e comprovam que consultas não escrevem. **O aceite conversacional de A02/A06 e a integração de A08 ainda dependem de ensaio no VS Code:** não houve execução do modelo nem autenticação/aquisição via GitHub nesta etapa.
+
 Para dois participantes, a arquitetura local é suficiente: cada pessoa usa seu clone e seu outtie. Não há necessidade demonstrada de servidor, contas centralizadas, banco compartilhado ou mais agentes. O esforço principal deve ir para a jornada, a confiabilidade da preparação e os testes de uso.
 
 ## Escopo e evidências

@@ -6,6 +6,36 @@ Selecionar copiloto-desenvolvimento e conversar normalmente. Não precisa memori
 
 Em um perfil novo, cargo, área, atuação em liderança e fuso horário começam pendentes. DevOps, Operação e America/Fortaleza podem ser sugeridos para este piloto; confirme o que se aplica a você. Informe o fechamento do PDI separadamente do corte de evidências. Se já houver valores registrados de uma versão anterior, revise-os com o assistente antes de usá-los como base do plano.
 
+## Atalhos e resultados
+
+| Atalho no chat | O que fornecer | Resultado esperado |
+| --- | --- | --- |
+| `/pdi-iniciar` | Dizer se já tem PDI; responder às perguntas faltantes | Contexto recuperado, rascunho/proposta e próximo passo |
+| `/pdi-status` | Ciclo, se quiser consultar um rascunho específico | Resumo de pendências, atrasos e próximo passo, sem alterar estado |
+| `/pdi-importar` | Arquivo ou caminho do PDI/avaliação | Fonte preservada e proposta de incorporação |
+| `/pdi-atualizar` | Relato, data e eventual evidência | Proposta com diferenças e registros após revisão |
+| `/pdi-p2p` | Período e assuntos da conversa | Pauta em notas com avanços, dificuldades e perguntas |
+| `/pdi-marco` | Período ou marco desejado | Consolidação em notas com realizações e evidências |
+| `/pdi-exportar` | Ciclo e destino/formato desejado | Arquivos Markdown/JSON para revisar e copiar |
+| `/pdi-fechar` | Ciclo a encerrar | Prévia de pendências; archive verificável após autorização |
+| `/pdi-novo-ciclo` | Período e objetivos, mesmo incompletos | Novo rascunho, com ativação e transferências revisadas separadamente |
+
+Os atalhos conduzem conversas; não são executáveis do terminal. O assistente informa o caminho de cada artefato criado e se está em rascunho, proposto ou aplicado.
+
+## Pausar e retomar o início
+
+O assistente registra respostas ainda incompletas em `pessoal/inbox/onboarding.md`, usando o [modelo de notas](../templates/onboarding.md), ou em propostas. Respostas aprovadas entram no perfil/calendário por `proposal` e `apply`. Uma nota ou proposta pendente não é um compromisso aplicado.
+
+Em outra sessão, `/pdi-iniciar` consulta o estado, as propostas pendentes e essas notas antes de perguntar novamente. Se houver vários rascunhos, você escolhe qual retomar. Nenhum é ativado apenas por ser consultado. Informações que você ainda não conhece podem continuar pendentes; não é obrigatório anexar documentos para preparar o rascunho.
+
+No terminal:
+
+```bash
+python3 scripts/pdi.py onboarding --format text
+python3 scripts/pdi.py status --format text
+python3 scripts/pdi.py onboarding --cycle ID_DO_RASCUNHO --format text
+```
+
 ## Informações úteis
 
 Avaliação anterior, feedbacks, matriz de competências, PDI parcial, P2Ps, retro, entregas, certificações e aspirações. Datas reais do ciclo, cortes, disponibilidade e restrições são essenciais. Pode começar sem todas as informações: desconhecidos ficam registrados. Evidência que só existe em link pode ser referenciada, mas não será chamada de inspecionada sem leitura.

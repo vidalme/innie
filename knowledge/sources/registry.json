@@ -6,7 +6,8 @@
       "original_name": "Avaliação de Desempenho(1).md",
       "sha256": "0ad6908ac5b2a5fa3689dc8dfbf6a0c1703c63535013e45dc5b7e1db7413cae3",
       "scope": "institutional",
-      "current_cycle_confirmation": "pending"
+      "current_cycle_confirmation": "pending",
+      "availability": "distributed"
     },
     {
       "id": "I02",
@@ -14,7 +15,8 @@
       "original_name": "PDI - Plano de Desempenho Individual(1).md",
       "sha256": "088deefcc582179fa1b63ded155985d2710cc381e065481def8663e1044cd000",
       "scope": "institutional",
-      "current_cycle_confirmation": "pending"
+      "current_cycle_confirmation": "pending",
+      "availability": "distributed"
     },
     {
       "id": "I03",
@@ -22,7 +24,8 @@
       "original_name": "Formulário Avaliação de Desempenho(2).md",
       "sha256": "d4eb246a86ea1d4000da770913940722f2b7e1024bb2e06e995a1dbcc4e79887",
       "scope": "institutional",
-      "current_cycle_confirmation": "pending"
+      "current_cycle_confirmation": "pending",
+      "availability": "distributed"
     },
     {
       "id": "I04",
@@ -30,7 +33,8 @@
       "original_name": "promoção-e-bonificação(2).md",
       "sha256": "cb30cf9163bd1dbf6606d1df6b9a6c682c9cccffc96145e7fafa8e65c918add7",
       "scope": "institutional",
-      "current_cycle_confirmation": "pending"
+      "current_cycle_confirmation": "pending",
+      "availability": "distributed"
     },
     {
       "id": "I05",
@@ -38,7 +42,8 @@
       "original_name": "Critérios Institucionais(2).html",
       "sha256": "16ab9c1286e0688f8b1b34d9fb2de521ba327cb7f60d5f670d8d4cffb8ebdca7",
       "scope": "institutional",
-      "current_cycle_confirmation": "pending"
+      "current_cycle_confirmation": "pending",
+      "availability": "distributed"
     },
     {
       "id": "I06",
@@ -46,15 +51,52 @@
       "original_name": "Critérios adicionais Operação(2).html",
       "sha256": "c623e463f06806340b2017e50f7576bb8547ee7c0b513bcf158366374c514490",
       "scope": "institutional",
-      "current_cycle_confirmation": "pending"
+      "current_cycle_confirmation": "pending",
+      "availability": "distributed"
     },
     {
       "id": "I07",
-      "file": "../competencies/devops.json",
+      "file": "competencies/devops.json",
       "original_name": "DevOps(2).html",
       "sha256_original_mixed": "25251a5e159730d7736523a6fd8a7808a072dc63f35eccfa37e8f77898a67734",
       "personal_annotations_removed": true,
-      "raw_source_distributed": false
+      "raw_source_distributed": false,
+      "artifact_kind": "sanitized_extract",
+      "scope": "institutional",
+      "current_cycle_confirmation": "pending",
+      "availability": "distributed",
+      "sha256": "e739f21111c6a3be3ba36c728aa0f9f2261abd53135de955cccc4344c2ac5f61"
+    },
+    {
+      "id": "I08",
+      "file": null,
+      "original_name": "9box.png",
+      "availability": "not_distributed",
+      "scope": "institutional",
+      "current_cycle_confirmation": "pending",
+      "limitation": "Imagem citada no material histórico; original indisponível neste pacote. Não permite conferir limites visuais."
+    },
+    {
+      "id": "X02",
+      "file": null,
+      "original_name": "tabela_salarial.md",
+      "availability": "not_distributed",
+      "scope": "historical_reference",
+      "limitation": "Tabela citada historicamente; original indisponível neste pacote. Não usar para valores atuais."
+    },
+    {
+      "id": "P01",
+      "file": "evidence-guidance/requirements.md",
+      "original_name": "metas.md",
+      "artifact_kind": "sanitized_extract",
+      "raw_source_distributed": false,
+      "personal_annotations_removed": true,
+      "scope": "guidance_pending_confirmation",
+      "current_cycle_confirmation": "pending",
+      "limitation": "Somente orientações extraídas e sanitizadas são distribuídas; original pessoal não foi reinspecionado nesta manutenção.",
+      "availability": "distributed",
+      "sha256": "4a05ab5f084b792d0c4281dd4c5a79761b586394739ce075517018522b12d6fd"
     }
-  ]
+  ],
+  "path_base": "knowledge"
 }

@@ -42,6 +42,123 @@ class SystemTests(unittest.TestCase):
     def action(self, **fields):
         self.change([{"op":"upsert", "collection":"actions", "value":{"id":"a1", "title":"Atividade fictícia", "status":"planned", "due_on":"2027-03-01", "effort_hours":2, **fields}}])
 
+    def test_guidance_before_setup_does_not_create_space(self):
+        from pdi_copilot.journey import guidance, status_report
+        store = Store(self.base / 'not-created')
+        self.assertEqual(guidance(store)['stage'], 'setup_required')
+        self.assertEqual(status_report(store)['status'], 'setup_required')
+        self.assertFalse(store.root.exists())
+
+    def test_empty_status_and_drafts_require_explicit_selection(self):
+        from pdi_copilot.journey import guidance, status_report, guidance_text
+        self.assertEqual(status_report(self.store)['status'], 'no_active_cycle')
+        for cid in ('draft-a', 'draft-b'):
+            create_cycle(self.store, cid, 'Rascunho fictício')
+            result = status_report(self.store)
+            self.assertIsNone(result['cycle_id'])
+            self.assertEqual(result['onboarding']['stage'], 'cycle_selection')
+        before = {p.relative_to(self.store.root): p.read_bytes()
+                  for p in self.store.root.rglob('*') if p.is_file()}
+        selected = status_report(self.store, 'draft-b')
+        self.assertEqual(selected['status'], 'draft')
+        self.assertEqual(selected['cycle_id'], 'draft-b')
+        self.assertIn('draft-b', guidance_text(selected))
+        self.assertIsNone(self.store.load()['active_cycle'])
+        self.assertEqual(before, {p.relative_to(self.store.root): p.read_bytes()
+                                 for p in self.store.root.rglob('*') if p.is_file()})
+        with self.assertRaises(PDIError): guidance(self.store, 'missing')
+
+    def test_onboarding_resumes_notes_proposals_and_applied_answers(self):
+        from pdi_copilot.journey import guidance
+        create_cycle(self.store, 'draft', 'Rascunho fictício')
+        note = self.store.root / 'inbox/onboarding.md'
+        note.write_text('Relato fictício: função Engenharia; senioridade Pleno. Data desconhecida.')
+        proposal = prepare_proposal(self.store, [{'op': 'profile', 'value': {'role': 'Engenharia', 'seniority': 'Pleno'}}], 'Respostas fictícias')
+        result = guidance(Store(self.store.root), 'draft')
+        self.assertEqual(result['stage'], 'proposal_review')
+        self.assertEqual(result['resume_notes'], [str(note)])
+        self.assertEqual(result['pending_proposals'][0]['status'], 'awaiting_review')
+        self.assertIsNone(result['profile']['role'])
+        apply_proposal(self.store, proposal['proposal'], True)
+        resumed = guidance(Store(self.store.root), 'draft')
+        self.assertEqual(resumed['pending_proposals'], [])
+        self.assertNotIn('role', resumed['missing_profile'])
+        self.assertNotIn('seniority', resumed['missing_profile'])
+        self.assertEqual(len(resumed['questions']), 2)
+        self.assertEqual(note.read_text(), 'Relato fictício: função Engenharia; senioridade Pleno. Data desconhecida.')
+
+    def test_onboarding_exposes_stale_and_broken_proposals(self):
+        from pdi_copilot.journey import guidance
+        proposal = prepare_proposal(self.store, [{'op': 'profile', 'value': {'role': 'Engenharia'}}], 'Candidato fictício')
+        self.change([{'op': 'profile', 'value': {'area': 'Área fictícia'}}])
+        result = guidance(self.store)
+        self.assertEqual(result['pending_proposals'][0]['status'], 'stale')
+        self.assertIsNone(result['profile']['role'])
+        (self.store.root / 'proposals/broken.json').write_text('{broken')
+        result = guidance(self.store)
+        self.assertEqual(result['stage'], 'proposal_check_required')
+        self.assertEqual(len(result['proposal_issues']), 1)
+        self.assertTrue(Path(proposal['proposal']).exists())
+
+    def test_onboarding_without_documents_can_reach_plan_building(self):
+        from pdi_copilot.journey import guidance
+        create_cycle(self.store, 'draft', 'Ciclo fictício', '2026-07-01', '2027-05-31', '2027-04-30')
+        self.change([{'op': 'profile', 'value': {'role': 'Engenharia', 'seniority': 'Pleno',
+                    'area': 'Área fictícia', 'career_goal': 'Objetivo fictício',
+                    'weekly_capacity_hours': 0, 'timezone': 'UTC', 'leadership': False}}])
+        result = guidance(self.store, 'draft')
+        self.assertEqual(result['stage'], 'plan_building')
+        self.assertEqual(result['missing_profile'], [])
+        self.assertIn('pdi_closes_on', result['missing_calendar'])
+        self.assertEqual(result['source_count'], 0)
+        self.assertIn('opcionais', result['next_steps'][0])
+
+    def test_status_cli_json_and_text_without_cycle(self):
+        source = Path(__file__).resolve().parents[1]
+        for command in ('onboarding', 'status'):
+            for fmt in ('json', 'text'):
+                result = subprocess.run([sys.executable, str(source / 'scripts/pdi.py'),
+                    '--outtie', str(self.store.root), command, '--format', fmt],
+                    check=True, capture_output=True, text=True)
+                if fmt == 'json': self.assertEqual(json.loads(result.stdout)['revision'], 0)
+                else: self.assertIn('Ciclo ativo: nenhum', result.stdout)
+
+    def test_status_keeps_active_indicators_and_can_consult_archive(self):
+        from pdi_copilot.journey import status_report
+        self.new_cycle()
+        self.action(effort_hours=None)
+        state = self.store.load()
+        result = status_report(self.store, on='2027-03-02')
+        for key, value in overview(state, on='2027-03-02').items():
+            self.assertEqual(result[key], value)
+        self.assertEqual(result['onboarding']['stage'], 'tracking')
+        close_cycle(self.store, 'cycle-1', self.innie, approved=True)
+        self.assertEqual(status_report(self.store)['status'], 'no_active_cycle')
+        self.assertEqual(status_report(self.store, 'cycle-1')['onboarding']['stage'], 'archived')
+
+    def test_package_rejects_source_corruption_and_unknown_reference(self):
+        source = Path(__file__).resolve().parents[1]
+        package = self.base / 'package'
+        # Funciona também numa distribuição sem .git; nunca copia o outtie/configuração.
+        package.mkdir()
+        for folder in ('.github', 'scripts', 'src', 'schemas', 'templates', 'docs', 'knowledge'):
+            shutil.copytree(source / folder, package / folder, ignore=shutil.ignore_patterns('__pycache__'))
+        for name in ('README.md', 'INSTALL.md', 'AGENTS.md', 'CHANGELOG.md', 'pdi.code-workspace'):
+            shutil.copyfile(source / name, package / name)
+        def check():
+            return subprocess.run([sys.executable, str(package / 'scripts/check_package.py'), '--distribution'], capture_output=True, text=True)
+        result = check()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        matrix = package / 'knowledge/competencies/devops.json'
+        original = matrix.read_text(); matrix.write_text(original + ' ')
+        result = check(); self.assertNotEqual(result.returncode, 0)
+        self.assertIn('divergente: I07', result.stderr)
+        matrix.write_text(original)
+        summary = package / 'knowledge/policies/summary.md'
+        summary.write_text(summary.read_text() + '\nFonte X99 não registrada.\n')
+        result = check(); self.assertNotEqual(result.returncode, 0)
+        self.assertIn('X99', result.stderr)
+
     def test_setup_idempotent(self):
         self.assertFalse(self.store.initialize()); self.assertEqual(self.store.load()["revision"], 0)
 

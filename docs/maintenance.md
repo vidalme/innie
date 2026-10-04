@@ -1,8 +1,10 @@
 # Manutenção e publicação
 
-## Preparar os repositórios
+Este documento é para quem mantém e distribui o núcleo. Participantes começam pelo [INSTALL](../INSTALL.md), clonando o repositório já publicado.
 
-Os ZIPs não contêm `.git`, symlink ou dados pessoais. Criar dois repositórios separados no serviço autorizado. `innie` é interno à empresa porque contém normas institucionais; `outtie` pode permanecer local ou usar um remoto privado permitido.
+## Publicar o núcleo pela primeira vez
+
+Se o núcleo ainda não estiver em Git, inicializar e publicar no serviço autorizado. Não repetir esta inicialização em um clone existente. Manter repositórios separados quando houver versionamento individual. `innie` é interno à empresa porque contém normas institucionais; `outtie` pode permanecer local ou usar um remoto privado permitido.
 
 Depois de copiar e verificar:
 

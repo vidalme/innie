@@ -1,9 +1,11 @@
 # Contrato específico
 
-**Ativa quando:** fechamento ou solicitação de novo ciclo. **Entradas:** ciclo atual, resultado disponível, calendário novo e objetivos selecionados. **Passos:** consolidar; revisar pendências; gerar arquivo verificável; registrar fechamento; criar novo rascunho; selecionar transferências e reavaliar janelas. **Saídas:** archive rotulado, novo ciclo e relatório de transferência. **Aceitação:** ciclo antigo íntegro, percentuais não herdados e evidências históricas identificadas. **Limite:** não sobrescreve arquivo existente; resultados tardios entram como adendo.
+**Ativa quando:** fechamento ou solicitação de novo ciclo. O pedido determina a operação; elas não são automaticamente encadeadas.
 
-## Operação local
+**Fechar:** receber ID do ciclo; consolidar e apresentar pendências antes da autorização. Após autorização, fechar e verificar o archive. Entregar caminho/hash e pendências preservadas. Não criar novo ciclo sem pedido.
 
-Revisar `status`, render e evidências; executar `cycle close ID --approve` após decisão; verificar archive; criar novo ciclo com `cycle create`, revisar datas e `cycle start --reviewed`. Transferir ações incompletas com `cycle carry`, sem limpar pendências anteriores.
+**Novo ciclo:** recuperar ciclos existentes, perguntar por rascunho reutilizável e período/objetivos faltantes. Criar rascunho quando solicitado; não encerrar outro ativo implicitamente. Ativação exige revisão do calendário/plano e ausência de outro ativo. Transferências são escolhas explícitas; não herdar percentuais/confirmacões.
 
-As verificações semânticas dependem do assistente e da revisão humana; o CLI protege estrutura e persistência.
+**Aceitação:** operação corresponde ao pedido; ciclo antigo íntegro; datas desconhecidas continuam pendentes no rascunho; evidências históricas identificadas; ações transferidas conservam origem e pendências anteriores. Informar caminhos e situação (rascunho/ativo/arquivado) no resultado.
+
+**Limite:** não sobrescrever archive; resultados tardios entram como adendo. Sem autorização de fechamento/ativação, entregar prévia revisável e indicar o que aguarda decisão.
