@@ -14,7 +14,7 @@ import sys
 from . import __version__
 from .model import PDIError, SCHEMA, cycle, find, new_id, now, validate, window
 from .operations import (apply_proposal, backup, close_cycle, connect, create_cycle, doctor, import_source,
-                         check_connection, check_environment, init_git, prepare_proposal, restore, start_cycle, verify_archive)
+                         check_connection, check_environment, init_git, policy_alignment, prepare_proposal, restore, start_cycle, verify_archive)
 from .storage import Store, read_json, write_json
 from .views import export_pdi, render
 from .journey import guidance, guidance_text, status_report
@@ -43,6 +43,7 @@ def parser():
     commands.add_parser("validate", help="Validar estado atual")
     criteria = commands.add_parser("criteria", help="Listar critérios aplicáveis; não decide elegibilidade")
     criteria.add_argument("--type", choices=["horizontal", "vertical", "bonus"], default="horizontal")
+    criteria.add_argument("--cycle", help="Ciclo cuja versão institucional será conferida")
     git = commands.add_parser("init-git", help="Inicializar Git local; sem remote/push")
     git.add_argument("--scope", choices=["outtie", "innie"], default="outtie")
     imp = commands.add_parser("import", help="Preservar arquivo e extrair texto quando possível")
@@ -204,10 +205,16 @@ def run(args):
         state = store.load(); return {"valid": True, "revision": state["revision"]}
     if args.command == "criteria":
         state = store.load(); area = str(state["profile"].get("area", "")).casefold()
-        catalog = read_json(INNIE / "knowledge/criteria/catalog.json")
+        selected = cycle(state, args.cycle) if args.cycle else (cycle(state) if state['active_cycle'] else None)
+        alignment = policy_alignment(INNIE, selected)
+        if not alignment['aligned']:
+            raise PDIError(f"Versão institucional divergente: {alignment}. Revise a política do ciclo antes de usar os critérios atuais.")
+        index = read_json(INNIE / "knowledge/index.json")
+        catalog = read_json(INNIE / "knowledge" / index['criteria'])
         records = [{**c, "classification": c["types"][args.type]} for c in catalog["criteria"]
                    if c["scope"] == "all" or area in {c["scope"].casefold(), "operacao"} and c["scope"] == "Operação"]
         return {"type": args.type, "policy_confirmation": catalog["cycle_validity"], "criteria": records,
+                "policy_alignment": alignment,
                 "area_pending": state["profile"].get("area") is None,
                 "minimum_interval_between_promotions": "not_confirmed", "official_eligibility": "not_determined"}
     if args.command == "migrate":

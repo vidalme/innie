@@ -18,6 +18,8 @@ id, label, status, starts_on, ends_on, evidence_cutoff_on, pdi_closes_on, evalua
 
 Estados: draft, active, archived. Uma pessoa tem no máximo um ciclo ativo. Pode haver vários rascunhos. Arquivado não é editável pelo fluxo comum; adenda separados registram documentos tardios sem alterar o arquivo congelado.
 
+Novos ciclos registram a versão institucional declarada pelo índice de conhecimento atual. Consultas de critérios, ativação e fechamento conferem essa versão com a do catálogo e a do ciclo; divergência exige revisão explícita por proposta. Essa checagem local não confirma vigência das normas perante a instituição. Archives existentes permanecem congelados.
+
 O fechamento do PDI (`pdi_closes_on`) começa desconhecido mesmo quando o corte de evidências está informado. Cada data é preenchida por sua própria informação, via proposta de calendário.
 
 ## Fonte

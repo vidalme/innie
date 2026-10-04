@@ -145,7 +145,9 @@ def create_cycle(store, cycle_id, label, starts_on=None, ends_on=None, cutoff_on
         if existing:
             return {"id": cycle_id, "created": False, "status": existing["status"]}
         candidate = copy.deepcopy(state)
-        candidate["cycles"].append(blank_cycle(cycle_id, label, starts_on, ends_on, cutoff_on, evaluation_on))
+        index = read_json(Path(__file__).resolve().parents[2] / 'knowledge/index.json')
+        candidate["cycles"].append(blank_cycle(cycle_id, label, starts_on, ends_on, cutoff_on,
+                                                evaluation_on, index['institutional_version']))
         result = store.commit(candidate, state["revision"], f"Criar ciclo {cycle_id}")
     return {"id": cycle_id, "created": True, "revision": result["revision"], "status": "draft"}
 
@@ -161,6 +163,9 @@ def start_cycle(store, cycle_id, reviewed=False):
         candidate = copy.deepcopy(state); c = cycle(candidate, cycle_id)
         if c["status"] != "draft":
             raise PDIError("Só é possível ativar um ciclo em rascunho.")
+        alignment = policy_alignment(Path(__file__).resolve().parents[2], c)
+        if not alignment['aligned']:
+            raise PDIError(f"Versão institucional divergente: {alignment}. Revise a política do ciclo por proposta antes de ativar.")
         c["status"] = "active"; candidate["active_cycle"] = cycle_id
         result = store.commit(candidate, state["revision"], f"Ativar ciclo revisado {cycle_id}")
     return {"id": cycle_id, "started": True, "revision": result["revision"]}
@@ -224,6 +229,19 @@ def manifest(directory, exclude=None):
             files[rel.as_posix()] = digest(path)
     return files
 
+def policy_alignment(innie, selected=None):
+    """Compare a versão declarada pelo ciclo com os artefatos atuais."""
+    knowledge = Path(innie).resolve() / "knowledge"
+    index = read_json(knowledge / "index.json")
+    catalog = read_json(knowledge / index["criteria"])
+    institutional = index["institutional_version"]
+    catalog_version = catalog["version"]
+    cycle_version = selected.get("policy_version") if selected else None
+    aligned = institutional == catalog_version and (selected is None or cycle_version == institutional)
+    return {"aligned": aligned, "cycle_version": cycle_version,
+            "institutional_version": institutional, "catalog_version": catalog_version,
+            "review_required": not aligned}
+
 def close_cycle(store, cycle_id, innie, approved=False):
     if not approved:
         raise PDIError("Revise o fechamento e use --approve.")
@@ -233,6 +251,9 @@ def close_cycle(store, cycle_id, innie, approved=False):
             return {"id": cycle_id, "closed": False, "archive": original["archive_path"]}
         if original["status"] != "active":
             raise PDIError("Somente o ciclo ativo pode ser fechado.")
+        alignment = policy_alignment(innie, original)
+        if not alignment["aligned"]:
+            raise PDIError(f"Versão institucional divergente: {alignment}. Revise a política do ciclo por proposta antes de fechar.")
         candidate = copy.deepcopy(state); c = cycle(candidate, cycle_id)
         label = f"{c['starts_on']}_a_{c['ends_on']}__{cycle_id}"
         rel = "archives/" + label

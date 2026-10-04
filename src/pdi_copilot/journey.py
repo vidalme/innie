@@ -1,7 +1,10 @@
 """Orientação de início/retomada derivada do estado e de propostas persistidas."""
 from __future__ import annotations
 
+from pathlib import Path
+
 from .model import PDIError, cycle
+from .operations import policy_alignment
 from .storage import inside, read_json
 from .views import overview
 
@@ -48,7 +51,7 @@ def pending_proposals(store, revision):
             issues.append({'path': str(path), 'error': str(exc)})
     return pending, issues
 
-def guidance(store, cycle_id=None, state=None):
+def guidance(store, cycle_id=None, state=None, innie=None):
     """Somente leitura: respostas candidatas nunca viram fatos por esta consulta."""
     if state is None:
         if not (store.root / 'metadata.json').exists():
@@ -69,6 +72,8 @@ def guidance(store, cycle_id=None, state=None):
               'profile': profile, 'missing_profile': missing_profile, 'missing_calendar': missing_calendar,
               'source_count': len(state['sources']), 'pending_proposals': proposals, 'proposal_issues': issues,
               'resume_notes': [str(note)] if note.is_file() else [], 'questions': []}
+    if innie is not None:
+        result['policy_alignment'] = policy_alignment(innie, selected)
     if selected and selected['status'] == 'archived':
         stage, step = 'archived', 'Consulte o archive deste ciclo; para continuar, escolha um ciclo aberto.'
     elif issues:
@@ -102,7 +107,7 @@ def status_report(store, cycle_id=None, on=None):
         return {'revision': None, 'cycle_id': None, 'status': 'setup_required',
                 'onboarding': guidance(store, cycle_id)}
     state = store.load()
-    onboarding = guidance(store, cycle_id, state)
+    onboarding = guidance(store, cycle_id, state, Path(__file__).resolve().parents[2])
     selected = onboarding['selected_cycle']
     result = overview(state, selected, on) if selected else {'revision': state['revision'], 'cycle_id': None, 'status': 'no_active_cycle'}
     result['onboarding'] = onboarding
@@ -121,6 +126,9 @@ def guidance_text(result):
         lines.append('Perfil a completar: ' + ', '.join(FIELD_LABELS[key] for key in context['missing_profile']))
     if context.get('missing_calendar'):
         lines.append('Datas a confirmar: ' + ', '.join(FIELD_LABELS[key] for key in context['missing_calendar']))
+    alignment = context.get('policy_alignment')
+    if alignment and not alignment['aligned']:
+        lines.append('Política divergente: confira a versão do ciclo e os artefatos institucionais antes de usar critérios ou fechar.')
     if 'late_actions' in result:
         lines.extend([f"Ações em atraso: {', '.join(result['late_actions']) or 'nenhuma identificada'}",
                       f"Realizadas sem evidência: {', '.join(result['done_without_evidence']) or 'nenhuma identificada'}",

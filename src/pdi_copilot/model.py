@@ -62,7 +62,7 @@ def blank_state():
                         "weekly_capacity_hours": None, "leadership": None},
             "active_cycle": None, "sources": [], "evidence": [], "cycles": [], "changes": []}
 
-def blank_cycle(cycle_id, label, starts_on=None, ends_on=None, cutoff_on=None, evaluation_on=None, policy_version="2025-07-29"):
+def blank_cycle(cycle_id, label, starts_on=None, ends_on=None, cutoff_on=None, evaluation_on=None, policy_version=None):
     return {"id": valid_id(cycle_id), "label": label, "status": "draft",
             "starts_on": starts_on, "ends_on": ends_on, "evidence_cutoff_on": cutoff_on,
             "pdi_closes_on": None, "evaluation_on": evaluation_on,

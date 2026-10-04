@@ -27,6 +27,10 @@ class SystemTests(unittest.TestCase):
         self.base = Path(self.tmp.name)
         self.innie = self.base / "innie"; self.innie.mkdir()
         (self.innie / ".gitignore").write_text('/pessoal\n/.local/\n')
+        (self.innie / 'knowledge/criteria').mkdir(parents=True)
+        write_json(self.innie / 'knowledge/index.json',
+                   {'institutional_version': '2025-07-29', 'criteria': 'criteria/catalog.json'})
+        write_json(self.innie / 'knowledge/criteria/catalog.json', {'version': '2025-07-29'})
         self.store = Store(self.base / "outtie"); self.store.initialize()
 
     def tearDown(self): self.tmp.cleanup()
@@ -135,6 +139,31 @@ class SystemTests(unittest.TestCase):
         close_cycle(self.store, 'cycle-1', self.innie, approved=True)
         self.assertEqual(status_report(self.store)['status'], 'no_active_cycle')
         self.assertEqual(status_report(self.store, 'cycle-1')['onboarding']['stage'], 'archived')
+
+    def test_policy_mismatch_requires_review_before_criteria_or_close(self):
+        self.new_cycle()
+        self.change([{'op': 'calendar', 'cycle_id': 'cycle-1',
+                      'value': {'policy_version': 'versao-anterior'}}])
+        from pdi_copilot.journey import status_report
+        self.assertTrue(status_report(self.store)['onboarding']['policy_alignment']['review_required'])
+        with self.assertRaisesRegex(PDIError, 'Versão institucional divergente'):
+            run(parser().parse_args(['--outtie', str(self.store.root), 'criteria']))
+        with self.assertRaisesRegex(PDIError, 'Versão institucional divergente'):
+            close_cycle(self.store, 'cycle-1', self.innie, approved=True)
+        self.assertEqual(self.store.load()['active_cycle'], 'cycle-1')
+        self.change([{'op': 'calendar', 'cycle_id': 'cycle-1',
+                      'value': {'policy_version': '2025-07-29'}}])
+        self.assertTrue(run(parser().parse_args(['--outtie', str(self.store.root), 'criteria']))
+                        ['policy_alignment']['aligned'])
+        self.assertTrue(close_cycle(self.store, 'cycle-1', self.innie, approved=True)['closed'])
+
+    def test_catalog_mismatch_blocks_closing_without_changing_state(self):
+        self.new_cycle()
+        write_json(self.innie / 'knowledge/criteria/catalog.json', {'version': 'versao-nova'})
+        before = self.store.load()
+        with self.assertRaisesRegex(PDIError, 'Versão institucional divergente'):
+            close_cycle(self.store, 'cycle-1', self.innie, approved=True)
+        self.assertEqual(self.store.load(), before)
 
     def test_package_rejects_source_corruption_and_unknown_reference(self):
         source = Path(__file__).resolve().parents[1]

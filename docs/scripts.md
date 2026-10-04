@@ -28,7 +28,7 @@ Antes de setup, `doctor` devolve `state: not_initialized`, `setup_required: true
 | `state` | Exibe snapshot completo atual |
 | `onboarding [--cycle ID] [--format json/text]` | Orienta início/retomada, lista lacunas, notas e propostas pendentes; somente leitura |
 | `validate` | Valida estrutura, status, datas, referências e hash |
-| `criteria [--type horizontal/vertical/bonus]` | Lista critérios aplicáveis à área; vigência/elegibilidade continuam pendentes |
+| `criteria [--type horizontal/vertical/bonus] [--cycle ID]` | Lista critérios aplicáveis à área após conferir a versão do ciclo com o catálogo; vigência/elegibilidade continuam pendentes |
 | `proposal --changes JSON --reason TEXTO` | Valida operações e guarda proposta na revisão corrente |
 | `apply --proposal CAMINHO --approve` | Aplica sob lock após revisar; conflitos interrompem |
 | `render [--cycle ID] [--preserve-edits]` | Regenera plano/painel do ciclo aberto; preserva edição divergente quando solicitado |
@@ -38,6 +38,8 @@ Antes de setup, `doctor` devolve `state: not_initialized`, `setup_required: true
 Texto não é resumido automaticamente pelo export: se exceder limite, revisar no assistente. Imagens/PDF sem texto não são interpretados pelo import. pdftotext é opcional; resultado visual exige conferência. Arquivos binários são preservados.
 
 Em `status`, esforço ausente/null deixa o total pendente e aparece em `actions_missing_effort`; `known_remaining_effort_hours` mantém a soma parcial. Uma sobrecarga já demonstrada por essa soma retorna true; estimativas incompletas não retornam false. Se faltar fuso no perfil, a data automática usa America/Fortaleza e sinaliza `reference_timezone_assumed: true`. Com `--on`, a data é explícita e `reference_timezone` fica null. Em `criteria`, `area_pending: true` indica que só foram selecionados critérios comuns e ainda falta confirmar a área.
+
+O `status` expõe `onboarding.policy_alignment` para o ciclo consultado. `criteria`, ativação e fechamento recusam versões divergentes entre ciclo, índice institucional e catálogo. Revise as regras e atualize a versão do ciclo por proposta antes de prosseguir. Isso não confirma vigência institucional nem altera archives anteriores.
 
 ## Ciclos
 

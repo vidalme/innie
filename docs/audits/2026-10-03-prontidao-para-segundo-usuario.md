@@ -28,6 +28,10 @@ Validação de A01: 70 testes passaram; `check_package.py`, `git diff --check` e
 
 Validação desta etapa: 78 testes automatizados, check_package e validação das duas skills alteradas. Dois clones Git locais de uma distribuição limpa passaram por bootstrap, doctor, status e onboarding; repetição preservou estado, os espaços foram distintos e as árvores Git permaneceram limpas. Os testes simulam a persistência/recuperação de duas respostas e comprovam que consultas não escrevem. **O aceite conversacional de A02/A06 e a integração de A08 ainda dependem de ensaio no VS Code:** não houve execução do modelo nem autenticação/aquisição via GitHub nesta etapa.
 
+**Continuação — A09:** ciclos novos usam a versão institucional declarada no índice atual. `status` mostra se ela coincide com a versão do ciclo e do catálogo; `criteria`, ativação e fechamento recusam divergências até revisão do ciclo por proposta. O fechamento não altera archives anteriores. Isso detecta incompatibilidade local entre versões; não valida a vigência institucional nem disponibiliza catálogos históricos selecionáveis.
+
+Validação de A09: 80 testes automatizados passaram, incluindo divergência no ciclo e no catálogo sem alterar o estado; `check_package.py` e `git diff --check` passaram. A08 e o aceite conversacional de A02/A06 continuam pendentes no VS Code.
+
 Para dois participantes, a arquitetura local é suficiente: cada pessoa usa seu clone e seu outtie. Não há necessidade demonstrada de servidor, contas centralizadas, banco compartilhado ou mais agentes. O esforço principal deve ir para a jornada, a confiabilidade da preparação e os testes de uso.
 
 ## Escopo e evidências
